@@ -230,10 +230,12 @@ input[type=checkbox]{
   <button class="restore" onclick="document.getElementById('fileInput').click()">Restaurer</button>
 </div>
 
-<input id="fileInput"
-       type="file"
-       accept=".json,application/json"
-       onchange="restoreData(event)">
+<input
+  id="fileInput"
+  type="file"
+  accept=".json,application/json"
+  onchange="restoreData(event)"
+>
 
 <div id="groups"></div>
 
@@ -285,8 +287,10 @@ function save(){
 function load(){
   try{
     const saved=localStorage.getItem(STORAGE_KEY);
+
     if(saved){
       const parsed=JSON.parse(saved);
+
       if(parsed && Array.isArray(parsed.lists)){
         appData=parsed;
       }
@@ -326,6 +330,7 @@ function renderListSelector(){
     option.value=list.id;
     option.textContent=list.name;
     option.selected=list.id===appData.activeListId;
+
     select.appendChild(option);
   });
 }
@@ -338,9 +343,13 @@ function changeList(listId){
 
 function createList(){
   const name=prompt("Nom de la nouvelle liste :");
-  if(name===null || !name.trim())return;
+
+  if(name===null || !name.trim()){
+    return;
+  }
 
   const list=newList(name.trim());
+
   appData.lists.push(list);
   appData.activeListId=list.id;
 
@@ -350,12 +359,22 @@ function createList(){
 
 function renameList(){
   const list=currentList();
-  if(!list)return;
 
-  const name=prompt("Nouveau nom de la liste :",list.name);
-  if(name===null || !name.trim())return;
+  if(!list){
+    return;
+  }
+
+  const name=prompt(
+    "Nouveau nom de la liste :",
+    list.name
+  );
+
+  if(name===null || !name.trim()){
+    return;
+  }
 
   list.name=name.trim();
+
   save();
   render();
 }
@@ -369,47 +388,171 @@ function deleteList(){
   const list=currentList();
 
   if(!confirm(
-    "Supprimer la liste « "+list.name+" » et tous ses joueurs ?"
-  ))return;
+    "Supprimer la liste « "+list.name+
+    " » et tous ses joueurs ?"
+  )){
+    return;
+  }
 
-  appData.lists=appData.lists.filter(l=>l.id!==list.id);
-  appData.activeListId=appData.lists[0].id;
+  appData.lists=
+    appData.lists.filter(l=>l.id!==list.id);
+
+  appData.activeListId=
+    appData.lists[0].id;
 
   save();
   render();
 }
 
+/*
+  DÉTERMINE LA COLONNE PRIORITAIRE.
+
+  0 = Présent
+  1 = P1
+  2 = P2
+  3 = P3
+  4 = P4
+
+  On cherche de P4 vers Présent.
+  La colonne la plus avancée contenant
+  au moins une case cochée devient prioritaire.
+*/
+function getPriorityColumn(players){
+
+  for(let column=4;column>=0;column--){
+
+    const hasChecked=
+      players.some(player=>
+        Boolean(player.checks[column])
+      );
+
+    if(hasChecked){
+      return column;
+    }
+  }
+
+  return -1;
+}
+
+/*
+  TRI DES JOUEURS.
+
+  - Si aucune case n'est cochée :
+    ordre alphabétique.
+
+  - Sinon :
+    joueurs cochés dans la colonne prioritaire
+    en premier, puis ordre alphabétique.
+
+  - Les joueurs non cochés restent ensuite
+    eux aussi en ordre alphabétique.
+*/
+function sortPlayers(players){
+
+  const sorted=[...players];
+
+  const priorityColumn=
+    getPriorityColumn(sorted);
+
+  sorted.sort((a,b)=>{
+
+    if(priorityColumn>=0){
+
+      const aChecked=
+        Boolean(a.checks[priorityColumn]);
+
+      const bChecked=
+        Boolean(b.checks[priorityColumn]);
+
+      if(aChecked && !bChecked){
+        return -1;
+      }
+
+      if(!aChecked && bChecked){
+        return 1;
+      }
+    }
+
+    return a.name.localeCompare(
+      b.name,
+      "fr-CA",
+      {
+        sensitivity:"base",
+        ignorePunctuation:true
+      }
+    );
+  });
+
+  return sorted;
+}
+
 function renderGroups(){
-  const container=document.getElementById("groups");
+
+  const container=
+    document.getElementById("groups");
+
   container.innerHTML="";
 
   const list=currentList();
-  if(!list)return;
+
+  if(!list){
+    return;
+  }
 
   GROUPS.forEach(group=>{
-    const section=document.createElement("section");
-    section.className="group "+group.css;
 
-    const title=document.createElement("div");
+    const section=
+      document.createElement("section");
+
+    section.className=
+      "group "+group.css;
+
+    const title=
+      document.createElement("div");
+
     title.className="grouptitle";
 
-    const count=list.players.filter(p=>p.group===group.id).length;
-    title.textContent=group.name+" ("+count+")";
+    const groupPlayers=
+      list.players.filter(
+        player=>player.group===group.id
+      );
+
+    title.textContent=
+      group.name+
+      " ("+
+      groupPlayers.length+
+      ")";
 
     section.appendChild(title);
 
-    const players=list.players.filter(p=>p.group===group.id);
+    if(groupPlayers.length===0){
 
-    if(players.length===0){
-      const empty=document.createElement("div");
+      const empty=
+        document.createElement("div");
+
       empty.className="empty";
-      empty.textContent="Aucun joueur dans ce groupe";
+
+      empty.textContent=
+        "Aucun joueur dans ce groupe";
+
       section.appendChild(empty);
+
     }else{
-      const wrap=document.createElement("div");
+
+      /*
+        Ici on applique notre nouveau tri
+        dynamique avant d'afficher les joueurs.
+      */
+      const players=
+        sortPlayers(groupPlayers);
+
+      const wrap=
+        document.createElement("div");
+
       wrap.className="tablewrap";
 
-      const table=document.createElement("table");
+      const table=
+        document.createElement("table");
 
       table.innerHTML=`
         <thead>
@@ -427,10 +570,13 @@ function renderGroups(){
         <tbody></tbody>
       `;
 
-      const tbody=table.querySelector("tbody");
+      const tbody=
+        table.querySelector("tbody");
 
       players.forEach(player=>{
-        tbody.appendChild(makePlayerRow(player));
+        tbody.appendChild(
+          makePlayerRow(player)
+        );
       });
 
       wrap.appendChild(table);
@@ -442,62 +588,98 @@ function renderGroups(){
 }
 
 function makePlayerRow(player){
-  const tr=document.createElement("tr");
 
-  tr.appendChild(makeCheckbox(player,0));
+  const tr=
+    document.createElement("tr");
 
-  const nameTd=document.createElement("td");
+  tr.appendChild(
+    makeCheckbox(player,0)
+  );
+
+  const nameTd=
+    document.createElement("td");
+
   nameTd.className="name";
 
-  const input=document.createElement("input");
+  const input=
+    document.createElement("input");
+
   input.type="text";
   input.className="nameinput";
   input.value=player.name;
 
-  input.addEventListener("change",function(){
-    player.name=this.value.trim() || "Sans nom";
-    save();
-    render();
-  });
+  input.addEventListener(
+    "change",
+    function(){
+
+      player.name=
+        this.value.trim() || "Sans nom";
+
+      save();
+      render();
+    }
+  );
 
   nameTd.appendChild(input);
   tr.appendChild(nameTd);
 
   for(let i=1;i<=4;i++){
-    tr.appendChild(makeCheckbox(player,i));
+    tr.appendChild(
+      makeCheckbox(player,i)
+    );
   }
 
-  const groupTd=document.createElement("td");
-  const select=document.createElement("select");
+  const groupTd=
+    document.createElement("td");
+
+  const select=
+    document.createElement("select");
+
   select.className="groupselect";
 
   GROUPS.forEach(group=>{
-    const option=document.createElement("option");
+
+    const option=
+      document.createElement("option");
+
     option.value=group.id;
     option.textContent=group.name;
-    option.selected=player.group===group.id;
+    option.selected=
+      player.group===group.id;
+
     select.appendChild(option);
   });
 
-  select.addEventListener("change",function(){
-    player.group=this.value;
-    save();
-    render();
-  });
+  select.addEventListener(
+    "change",
+    function(){
+
+      player.group=this.value;
+
+      save();
+      render();
+    }
+  );
 
   groupTd.appendChild(select);
   tr.appendChild(groupTd);
 
-  const trashTd=document.createElement("td");
+  const trashTd=
+    document.createElement("td");
 
-  const trash=document.createElement("button");
+  const trash=
+    document.createElement("button");
+
   trash.className="trash";
   trash.textContent="🗑️";
   trash.title="Supprimer ce joueur";
 
-  trash.addEventListener("click",function(){
-    deletePlayer(player.id);
-  });
+  trash.addEventListener(
+    "click",
+    function(){
+      deletePlayer(player.id);
+    }
+  );
 
   trashTd.appendChild(trash);
   tr.appendChild(trashTd);
@@ -506,45 +688,93 @@ function makePlayerRow(player){
 }
 
 function makeCheckbox(player,index){
-  const td=document.createElement("td");
 
-  const box=document.createElement("input");
+  const td=
+    document.createElement("td");
+
+  const box=
+    document.createElement("input");
+
   box.type="checkbox";
-  box.checked=Boolean(player.checks[index]);
 
-  box.addEventListener("change",function(){
-    player.checks[index]=this.checked;
-    save();
-  });
+  box.checked=
+    Boolean(player.checks[index]);
+
+  box.addEventListener(
+    "change",
+    function(){
+
+      player.checks[index]=this.checked;
+
+      save();
+
+      /*
+        On réaffiche immédiatement la liste
+        afin d'appliquer le nouveau classement.
+      */
+      renderGroups();
+      updateStatus();
+    }
+  );
 
   td.appendChild(box);
+
   return td;
 }
 
 function addPlayer(){
+
   const list=currentList();
-  if(!list)return;
 
-  const name=prompt("Nom du joueur :");
-  if(name===null || !name.trim())return;
+  if(!list){
+    return;
+  }
 
-  let menu="Choisissez le groupe :\n\n";
-  GROUPS.forEach((g,i)=>{
-    menu+=(i+1)+" - "+g.name+"\n";
+  const name=
+    prompt("Nom du joueur :");
+
+  if(name===null || !name.trim()){
+    return;
+  }
+
+  let menu=
+    "Choisissez le groupe :\n\n";
+
+  GROUPS.forEach((group,index)=>{
+    menu+=
+      (index+1)+
+      " - "+
+      group.name+
+      "\n";
   });
 
-  const answer=prompt(menu,"1");
-  if(answer===null)return;
+  const answer=
+    prompt(menu,"1");
 
-  const number=parseInt(answer,10);
+  if(answer===null){
+    return;
+  }
 
-  if(number<1 || number>4 || isNaN(number)){
-    alert("Veuillez choisir 1, 2, 3 ou 4.");
+  const number=
+    parseInt(answer,10);
+
+  if(
+    number<1 ||
+    number>4 ||
+    isNaN(number)
+  ){
+    alert(
+      "Veuillez choisir 1, 2, 3 ou 4."
+    );
+
     return;
   }
 
   list.players.push(
-    newPlayer(name.trim(),GROUPS[number-1].id)
+    newPlayer(
+      name.trim(),
+      GROUPS[number-1].id
+    )
   );
 
   save();
@@ -552,30 +782,64 @@ function addPlayer(){
 }
 
 function deletePlayer(playerId){
+
   const list=currentList();
-  const player=list.players.find(p=>p.id===playerId);
-  if(!player)return;
 
-  if(!confirm("Supprimer « "+player.name+" » de cette liste ?"))return;
+  const player=
+    list.players.find(
+      p=>p.id===playerId
+    );
 
-  list.players=list.players.filter(p=>p.id!==playerId);
+  if(!player){
+    return;
+  }
+
+  if(!confirm(
+    "Supprimer « "+
+    player.name+
+    " » de cette liste ?"
+  )){
+    return;
+  }
+
+  list.players=
+    list.players.filter(
+      p=>p.id!==playerId
+    );
 
   save();
   render();
 }
 
 function resetChecks(){
+
   const list=currentList();
-  if(!list || !list.players.length)return;
+
+  if(
+    !list ||
+    !list.players.length
+  ){
+    return;
+  }
 
   if(!confirm(
     "Décocher toutes les cases de la liste « "+
     list.name+
-    " » ?\n\nLes joueurs et leurs groupes seront conservés."
-  ))return;
+    " » ?\n\n"+
+    "Les joueurs et leurs groupes seront conservés."
+  )){
+    return;
+  }
 
   list.players.forEach(player=>{
-    player.checks=[false,false,false,false,false];
+
+    player.checks=[
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   });
 
   save();
@@ -583,6 +847,7 @@ function resetChecks(){
 }
 
 function backupData(){
+
   const backup={
     application:"Contrôle des joueurs",
     version:3,
@@ -590,45 +855,84 @@ function backupData(){
     data:appData
   };
 
-  const blob=new Blob(
-    [JSON.stringify(backup,null,2)],
-    {type:"application/json"}
-  );
+  const blob=
+    new Blob(
+      [
+        JSON.stringify(
+          backup,
+          null,
+          2
+        )
+      ],
+      {
+        type:"application/json"
+      }
+    );
 
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement("a");
-  const date=new Date().toISOString().slice(0,10);
+  const url=
+    URL.createObjectURL(blob);
+
+  const link=
+    document.createElement("a");
+
+  const date=
+    new Date()
+      .toISOString()
+      .slice(0,10);
 
   link.href=url;
-  link.download="sauvegarde-joueurs-"+date+".json";
+
+  link.download=
+    "sauvegarde-joueurs-"+
+    date+
+    ".json";
 
   document.body.appendChild(link);
+
   link.click();
+
   document.body.removeChild(link);
 
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setTimeout(
+    ()=>URL.revokeObjectURL(url),
+    1000
+  );
 }
 
 function restoreData(event){
-  const file=event.target.files[0];
-  if(!file)return;
 
-  const reader=new FileReader();
+  const file=
+    event.target.files[0];
+
+  if(!file){
+    return;
+  }
+
+  const reader=
+    new FileReader();
 
   reader.onload=function(e){
+
     try{
-      const backup=JSON.parse(e.target.result);
+
+      const backup=
+        JSON.parse(e.target.result);
 
       if(
         !backup ||
         !backup.data ||
-        !Array.isArray(backup.data.lists)
+        !Array.isArray(
+          backup.data.lists
+        )
       ){
-        throw new Error("Sauvegarde invalide");
+        throw new Error(
+          "Sauvegarde invalide"
+        );
       }
 
       if(!confirm(
-        "Restaurer cette sauvegarde ?\n\nToutes les listes actuelles seront remplacées."
+        "Restaurer cette sauvegarde ?\n\n"+
+        "Toutes les listes actuelles seront remplacées."
       )){
         event.target.value="";
         return;
@@ -637,41 +941,77 @@ function restoreData(event){
       appData=backup.data;
 
       appData.lists.forEach(list=>{
-        if(!Array.isArray(list.players))list.players=[];
+
+        if(!Array.isArray(list.players)){
+          list.players=[];
+        }
 
         list.players.forEach(player=>{
-          if(!player.id)player.id=id();
 
-          if(!GROUPS.some(g=>g.id===player.group)){
-            player.group="hommes-reguliers";
+          if(!player.id){
+            player.id=id();
           }
 
-          if(!Array.isArray(player.checks)){
-            player.checks=[false,false,false,false,false];
+          if(
+            !GROUPS.some(
+              group=>
+                group.id===player.group
+            )
+          ){
+            player.group=
+              "hommes-reguliers";
           }
 
-          player.checks=player.checks.slice(0,5).map(Boolean);
+          if(
+            !Array.isArray(
+              player.checks
+            )
+          ){
+            player.checks=[
+              false,
+              false,
+              false,
+              false,
+              false
+            ];
+          }
 
-          while(player.checks.length<5){
+          player.checks=
+            player.checks
+              .slice(0,5)
+              .map(Boolean);
+
+          while(
+            player.checks.length<5
+          ){
             player.checks.push(false);
           }
         });
       });
 
       if(
-        !appData.lists.some(l=>l.id===appData.activeListId)
+        !appData.lists.some(
+          list=>
+            list.id===
+            appData.activeListId
+        )
       ){
-        appData.activeListId=appData.lists[0].id;
+        appData.activeListId=
+          appData.lists[0].id;
       }
 
       save();
       render();
 
-      alert("Sauvegarde restaurée.");
+      alert(
+        "Sauvegarde restaurée."
+      );
 
     }catch(error){
+
       alert(
-        "Impossible de restaurer ce fichier.\n\nLe fichier ne correspond pas à une sauvegarde valide."
+        "Impossible de restaurer ce fichier.\n\n"+
+        "Le fichier ne correspond pas à une sauvegarde valide."
       );
     }
 
@@ -682,27 +1022,43 @@ function restoreData(event){
 }
 
 function updateStatus(){
+
   const list=currentList();
 
   if(!list){
-    document.getElementById("status").textContent="";
+    document
+      .getElementById("status")
+      .textContent="";
+
     return;
   }
 
-  const present=list.players.filter(p=>p.checks[0]).length;
+  const present=
+    list.players.filter(
+      player=>
+        player.checks[0]
+    ).length;
 
-  document.getElementById("status").textContent=
-    list.players.length+
-    " joueur"+
-    (list.players.length!==1 ? "s" : "")+
-    " • "+
-    present+
-    " présent"+
-    (present!==1 ? "s" : "")+
-    " • "+
-    appData.lists.length+
-    " liste"+
-    (appData.lists.length!==1 ? "s" : "");
+  document
+    .getElementById("status")
+    .textContent=
+      list.players.length+
+      " joueur"+
+      (list.players.length!==1
+        ? "s"
+        : "")+
+      " • "+
+      present+
+      " présent"+
+      (present!==1
+        ? "s"
+        : "")+
+      " • "+
+      appData.lists.length+
+      " liste"+
+      (appData.lists.length!==1
+        ? "s"
+        : "");
 }
 
 load();
