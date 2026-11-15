@@ -284,6 +284,42 @@ function save(){
   updateStatus();
 }
 
+function correctInvalidChecks(){
+
+  appData.lists.forEach(list=>{
+
+    list.players.forEach(player=>{
+
+      if(!Array.isArray(player.checks)){
+        player.checks=[false,false,false,false,false];
+      }
+
+      player.checks=player.checks.slice(0,5).map(Boolean);
+
+      while(player.checks.length<5){
+        player.checks.push(false);
+      }
+
+      /*
+        Dès qu'une case non cochée est trouvée,
+        toutes les cases à droite sont décochées.
+      */
+      let chainValid=true;
+
+      for(let i=0;i<=4;i++){
+
+        if(!chainValid){
+          player.checks[i]=false;
+        }
+
+        if(!player.checks[i]){
+          chainValid=false;
+        }
+      }
+    });
+  });
+}
+
 function load(){
   try{
     const saved=localStorage.getItem(STORAGE_KEY);
@@ -301,13 +337,14 @@ function load(){
     const list=newList("Liste principale");
     appData.lists.push(list);
     appData.activeListId=list.id;
-    save();
   }
 
   if(!appData.lists.some(l=>l.id===appData.activeListId)){
     appData.activeListId=appData.lists[0].id;
   }
 
+  correctInvalidChecks();
+  save();
   render();
 }
 
@@ -327,6 +364,7 @@ function renderListSelector(){
 
   appData.lists.forEach(list=>{
     const option=document.createElement("option");
+
     option.value=list.id;
     option.textContent=list.name;
     option.selected=list.id===appData.activeListId;
@@ -380,6 +418,7 @@ function renameList(){
 }
 
 function deleteList(){
+
   if(appData.lists.length===1){
     alert("Vous devez conserver au moins une liste.");
     return;
@@ -405,64 +444,30 @@ function deleteList(){
 }
 
 /*
-  DÉTERMINE LA COLONNE PRIORITAIRE.
+  TRI HIÉRARCHIQUE
 
-  0 = Présent
-  1 = P1
-  2 = P2
-  3 = P3
-  4 = P4
+  Comparaison dans cet ordre :
 
-  On cherche de P4 vers Présent.
-  La colonne la plus avancée contenant
-  au moins une case cochée devient prioritaire.
-*/
-function getPriorityColumn(players){
+  Présent
+  P1
+  P2
+  P3
+  P4
 
-  for(let column=4;column>=0;column--){
+  À chaque étape :
+  coché passe avant non coché.
 
-    const hasChecked=
-      players.some(player=>
-        Boolean(player.checks[column])
-      );
-
-    if(hasChecked){
-      return column;
-    }
-  }
-
-  return -1;
-}
-
-/*
-  TRI DES JOUEURS.
-
-  - Si aucune case n'est cochée :
-    ordre alphabétique.
-
-  - Sinon :
-    joueurs cochés dans la colonne prioritaire
-    en premier, puis ordre alphabétique.
-
-  - Les joueurs non cochés restent ensuite
-    eux aussi en ordre alphabétique.
+  En cas d'égalité complète :
+  ordre alphabétique.
 */
 function sortPlayers(players){
 
-  const sorted=[...players];
+  return [...players].sort((a,b)=>{
 
-  const priorityColumn=
-    getPriorityColumn(sorted);
+    for(let column=0;column<=4;column++){
 
-  sorted.sort((a,b)=>{
-
-    if(priorityColumn>=0){
-
-      const aChecked=
-        Boolean(a.checks[priorityColumn]);
-
-      const bChecked=
-        Boolean(b.checks[priorityColumn]);
+      const aChecked=Boolean(a.checks[column]);
+      const bChecked=Boolean(b.checks[column]);
 
       if(aChecked && !bChecked){
         return -1;
@@ -482,14 +487,11 @@ function sortPlayers(players){
       }
     );
   });
-
-  return sorted;
 }
 
 function renderGroups(){
 
-  const container=
-    document.getElementById("groups");
+  const container=document.getElementById("groups");
 
   container.innerHTML="";
 
@@ -501,15 +503,10 @@ function renderGroups(){
 
   GROUPS.forEach(group=>{
 
-    const section=
-      document.createElement("section");
+    const section=document.createElement("section");
+    section.className="group "+group.css;
 
-    section.className=
-      "group "+group.css;
-
-    const title=
-      document.createElement("div");
-
+    const title=document.createElement("div");
     title.className="grouptitle";
 
     const groupPlayers=
@@ -518,41 +515,26 @@ function renderGroups(){
       );
 
     title.textContent=
-      group.name+
-      " ("+
-      groupPlayers.length+
-      ")";
+      group.name+" ("+groupPlayers.length+")";
 
     section.appendChild(title);
 
     if(groupPlayers.length===0){
 
-      const empty=
-        document.createElement("div");
-
+      const empty=document.createElement("div");
       empty.className="empty";
-
-      empty.textContent=
-        "Aucun joueur dans ce groupe";
+      empty.textContent="Aucun joueur dans ce groupe";
 
       section.appendChild(empty);
 
     }else{
 
-      /*
-        Ici on applique notre nouveau tri
-        dynamique avant d'afficher les joueurs.
-      */
-      const players=
-        sortPlayers(groupPlayers);
+      const players=sortPlayers(groupPlayers);
 
-      const wrap=
-        document.createElement("div");
-
+      const wrap=document.createElement("div");
       wrap.className="tablewrap";
 
-      const table=
-        document.createElement("table");
+      const table=document.createElement("table");
 
       table.innerHTML=`
         <thead>
@@ -570,13 +552,10 @@ function renderGroups(){
         <tbody></tbody>
       `;
 
-      const tbody=
-        table.querySelector("tbody");
+      const tbody=table.querySelector("tbody");
 
       players.forEach(player=>{
-        tbody.appendChild(
-          makePlayerRow(player)
-        );
+        tbody.appendChild(makePlayerRow(player));
       });
 
       wrap.appendChild(table);
@@ -589,97 +568,70 @@ function renderGroups(){
 
 function makePlayerRow(player){
 
-  const tr=
-    document.createElement("tr");
+  const tr=document.createElement("tr");
 
-  tr.appendChild(
-    makeCheckbox(player,0)
-  );
+  tr.appendChild(makeCheckbox(player,0));
 
-  const nameTd=
-    document.createElement("td");
-
+  const nameTd=document.createElement("td");
   nameTd.className="name";
 
-  const input=
-    document.createElement("input");
-
+  const input=document.createElement("input");
   input.type="text";
   input.className="nameinput";
   input.value=player.name;
 
-  input.addEventListener(
-    "change",
-    function(){
+  input.addEventListener("change",function(){
 
-      player.name=
-        this.value.trim() || "Sans nom";
+    player.name=this.value.trim() || "Sans nom";
 
-      save();
-      render();
-    }
-  );
+    save();
+    render();
+  });
 
   nameTd.appendChild(input);
   tr.appendChild(nameTd);
 
   for(let i=1;i<=4;i++){
-    tr.appendChild(
-      makeCheckbox(player,i)
-    );
+    tr.appendChild(makeCheckbox(player,i));
   }
 
-  const groupTd=
-    document.createElement("td");
+  const groupTd=document.createElement("td");
 
-  const select=
-    document.createElement("select");
-
+  const select=document.createElement("select");
   select.className="groupselect";
 
   GROUPS.forEach(group=>{
 
-    const option=
-      document.createElement("option");
+    const option=document.createElement("option");
 
     option.value=group.id;
     option.textContent=group.name;
-    option.selected=
-      player.group===group.id;
+    option.selected=player.group===group.id;
 
     select.appendChild(option);
   });
 
-  select.addEventListener(
-    "change",
-    function(){
+  select.addEventListener("change",function(){
 
-      player.group=this.value;
+    player.group=this.value;
 
-      save();
-      render();
-    }
-  );
+    save();
+    render();
+  });
 
   groupTd.appendChild(select);
   tr.appendChild(groupTd);
 
-  const trashTd=
-    document.createElement("td");
+  const trashTd=document.createElement("td");
 
-  const trash=
-    document.createElement("button");
-
+  const trash=document.createElement("button");
   trash.className="trash";
   trash.textContent="🗑️";
   trash.title="Supprimer ce joueur";
 
-  trash.addEventListener(
-    "click",
-    function(){
-      deletePlayer(player.id);
-    }
-  );
+  trash.addEventListener("click",function(){
+    deletePlayer(player.id);
+  });
 
   trashTd.appendChild(trash);
   tr.appendChild(trashTd);
@@ -687,35 +639,72 @@ function makePlayerRow(player){
   return tr;
 }
 
+/*
+  GESTION DES CASES
+
+  Présent -> P1 -> P2 -> P3 -> P4
+
+  Une case ne peut être cochée que lorsque
+  toutes les cases à sa gauche sont cochées.
+
+  Lorsqu'une case est décochée,
+  toutes les cases à sa droite sont décochées.
+*/
 function makeCheckbox(player,index){
 
-  const td=
-    document.createElement("td");
+  const td=document.createElement("td");
 
-  const box=
-    document.createElement("input");
+  const box=document.createElement("input");
 
   box.type="checkbox";
+  box.checked=Boolean(player.checks[index]);
 
-  box.checked=
-    Boolean(player.checks[index]);
+  box.addEventListener("change",function(){
 
-  box.addEventListener(
-    "change",
-    function(){
+    if(this.checked){
 
-      player.checks[index]=this.checked;
+      for(let left=0;left<index;left++){
 
-      save();
+        if(!player.checks[left]){
+
+          this.checked=false;
+
+          const requiredName=
+            left===0
+              ? "Présent"
+              : "P"+left;
+
+          alert(
+            "Vous devez d'abord cocher "+
+            requiredName+"."
+          );
+
+          return;
+        }
+      }
+
+      player.checks[index]=true;
+
+    }else{
 
       /*
-        On réaffiche immédiatement la liste
-        afin d'appliquer le nouveau classement.
+        La case choisie ET toutes celles
+        situées à droite deviennent non cochées.
       */
-      renderGroups();
-      updateStatus();
+      for(let right=index;right<=4;right++){
+        player.checks[right]=false;
+      }
     }
-  );
+
+    save();
+
+    /*
+      Réaffichage immédiat pour remettre
+      les joueurs dans le bon ordre.
+    */
+    renderGroups();
+    updateStatus();
+  });
 
   td.appendChild(box);
 
@@ -730,43 +719,32 @@ function addPlayer(){
     return;
   }
 
-  const name=
-    prompt("Nom du joueur :");
+  const name=prompt("Nom du joueur :");
 
   if(name===null || !name.trim()){
     return;
   }
 
-  let menu=
-    "Choisissez le groupe :\n\n";
+  let menu="Choisissez le groupe :\n\n";
 
   GROUPS.forEach((group,index)=>{
-    menu+=
-      (index+1)+
-      " - "+
-      group.name+
-      "\n";
+    menu+=(index+1)+" - "+group.name+"\n";
   });
 
-  const answer=
-    prompt(menu,"1");
+  const answer=prompt(menu,"1");
 
   if(answer===null){
     return;
   }
 
-  const number=
-    parseInt(answer,10);
+  const number=parseInt(answer,10);
 
   if(
     number<1 ||
     number>4 ||
     isNaN(number)
   ){
-    alert(
-      "Veuillez choisir 1, 2, 3 ou 4."
-    );
-
+    alert("Veuillez choisir 1, 2, 3 ou 4.");
     return;
   }
 
@@ -795,8 +773,7 @@ function deletePlayer(playerId){
   }
 
   if(!confirm(
-    "Supprimer « "+
-    player.name+
+    "Supprimer « "+player.name+
     " » de cette liste ?"
   )){
     return;
@@ -815,10 +792,7 @@ function resetChecks(){
 
   const list=currentList();
 
-  if(
-    !list ||
-    !list.players.length
-  ){
+  if(!list || !list.players.length){
     return;
   }
 
@@ -857,28 +831,16 @@ function backupData(){
 
   const blob=
     new Blob(
-      [
-        JSON.stringify(
-          backup,
-          null,
-          2
-        )
-      ],
-      {
-        type:"application/json"
-      }
+      [JSON.stringify(backup,null,2)],
+      {type:"application/json"}
     );
 
-  const url=
-    URL.createObjectURL(blob);
+  const url=URL.createObjectURL(blob);
 
-  const link=
-    document.createElement("a");
+  const link=document.createElement("a");
 
   const date=
-    new Date()
-      .toISOString()
-      .slice(0,10);
+    new Date().toISOString().slice(0,10);
 
   link.href=url;
 
@@ -901,33 +863,26 @@ function backupData(){
 
 function restoreData(event){
 
-  const file=
-    event.target.files[0];
+  const file=event.target.files[0];
 
   if(!file){
     return;
   }
 
-  const reader=
-    new FileReader();
+  const reader=new FileReader();
 
   reader.onload=function(e){
 
     try{
 
-      const backup=
-        JSON.parse(e.target.result);
+      const backup=JSON.parse(e.target.result);
 
       if(
         !backup ||
         !backup.data ||
-        !Array.isArray(
-          backup.data.lists
-        )
+        !Array.isArray(backup.data.lists)
       ){
-        throw new Error(
-          "Sauvegarde invalide"
-        );
+        throw new Error("Sauvegarde invalide");
       }
 
       if(!confirm(
@@ -954,19 +909,13 @@ function restoreData(event){
 
           if(
             !GROUPS.some(
-              group=>
-                group.id===player.group
+              group=>group.id===player.group
             )
           ){
-            player.group=
-              "hommes-reguliers";
+            player.group="hommes-reguliers";
           }
 
-          if(
-            !Array.isArray(
-              player.checks
-            )
-          ){
+          if(!Array.isArray(player.checks)){
             player.checks=[
               false,
               false,
@@ -977,35 +926,28 @@ function restoreData(event){
           }
 
           player.checks=
-            player.checks
-              .slice(0,5)
-              .map(Boolean);
+            player.checks.slice(0,5).map(Boolean);
 
-          while(
-            player.checks.length<5
-          ){
+          while(player.checks.length<5){
             player.checks.push(false);
           }
         });
       });
 
+      correctInvalidChecks();
+
       if(
         !appData.lists.some(
-          list=>
-            list.id===
-            appData.activeListId
+          list=>list.id===appData.activeListId
         )
       ){
-        appData.activeListId=
-          appData.lists[0].id;
+        appData.activeListId=appData.lists[0].id;
       }
 
       save();
       render();
 
-      alert(
-        "Sauvegarde restaurée."
-      );
+      alert("Sauvegarde restaurée.");
 
     }catch(error){
 
@@ -1026,6 +968,7 @@ function updateStatus(){
   const list=currentList();
 
   if(!list){
+
     document
       .getElementById("status")
       .textContent="";
@@ -1035,8 +978,7 @@ function updateStatus(){
 
   const present=
     list.players.filter(
-      player=>
-        player.checks[0]
+      player=>player.checks[0]
     ).length;
 
   document
@@ -1044,21 +986,15 @@ function updateStatus(){
     .textContent=
       list.players.length+
       " joueur"+
-      (list.players.length!==1
-        ? "s"
-        : "")+
+      (list.players.length!==1 ? "s" : "")+
       " • "+
       present+
       " présent"+
-      (present!==1
-        ? "s"
-        : "")+
+      (present!==1 ? "s" : "")+
       " • "+
       appData.lists.length+
       " liste"+
-      (appData.lists.length!==1
-        ? "s"
-        : "");
+      (appData.lists.length!==1 ? "s" : "");
 }
 
 load();
