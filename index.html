@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123b6d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Joueurs">
+
+<title>Contrôle des joueurs</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f3f5f7;
+  color: #17202a;
+}
+
+header {
+  background: #123b6d;
+  color: white;
+  padding: calc(15px + env(safe-area-inset-top)) 10px 15px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 23px;
+}
+
+header p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  opacity: .9;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 10px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.add {
+  background: #1677ff;
+  color: white;
+}
+
+.backup {
+  background: #198754;
+  color: white;
+}
+
+.restore {
+  background: #6f42c1;
+  color: white;
+}
+
+.reset {
+  background: #dc3545;
+  color: white;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 590px;
+}
+
+th {
+  background: #e7edf5;
+  padding: 11px 5px;
+  font-size: 14px;
+  border-bottom: 2px solid #cbd3dd;
+  position: sticky;
+  top: 0;
+}
+
+td {
+  padding: 9px 5px;
+  text-align: center;
+  border-bottom: 1px solid #e0e4e8;
+}
+
+th.name,
+td.name {
+  text-align: left;
+}
+
+td.name {
+  min-width: 190px;
+}
+
+.name-input {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 7px;
+  padding: 7px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.name-input:focus {
+  border-color: #1677ff;
+  background: #fff;
+  outline: none;
+}
+
+input[type="checkbox"] {
+  width: 30px;
+  height: 30px;
+  accent-color: #198754;
+  cursor: pointer;
+}
+
+.delete {
+  background: #ededed;
+  color: #b42318;
+  width: 38px;
+  padding: 8px 5px;
+}
+
+.info {
+  background: white;
+  margin-top: 10px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #495057;
+}
+
+#fileInput {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  main {
+    padding: 7px;
+  }
+
+  header h1 {
+    font-size: 21px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 12px 5px;
+  }
+
+  input[type="checkbox"] {
+    width: 32px;
+    height: 32px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Contrôle des joueurs</h1>
+  <p>Présences et parties</p>
+</header>
+
+<main>
+
+<div class="buttons">
+  <button class="add" onclick="addPlayer()">+ Ajouter joueur</button>
+  <button class="reset" onclick="resetChecks()">Tout décocher</button>
+  <button class="backup" onclick="backupData()">Sauvegarder</button>
+  <button class="restore" onclick="document.getElementById('fileInput').click()">Restaurer</button>
+</div>
+
+<input
+  id="fileInput"
+  type="file"
+  accept=".json,application/json"
+  onchange="restoreData(event)"
+>
+
+<div class="table-container">
+<table>
+
+<thead>
+<tr>
+  <th>Présent</th>
+  <th class="name">Nom</th>
+  <th>P1</th>
+  <th>P2</th>
+  <th>P3</th>
+  <th>P4</th>
+  <th></th>
+</tr>
+</thead>
+
+<tbody id="players"></tbody>
+
+</table>
+</div>
+
+<div class="info" id="status"></div>
+
+</main>
+
+<script>
+const STORAGE_KEY = "controle_joueurs_v2";
+
+let players = [];
+
+function newPlayer(name) {
+  return {
+    name: name,
+    checks: [false, false, false, false, false]
+  };
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (saved) {
+      const data = JSON.parse(saved);
+
+      if (Array.isArray(data)) {
+        players = data;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  render();
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+  updateStatus();
+}
+
+function render() {
+  const tbody = document.getElementById("players");
+
+  tbody.innerHTML = "";
+
+  players.forEach(function(player, playerIndex) {
+
+    const tr = document.createElement("tr");
+
+    const present = makeCheckbox(playerIndex, 0);
+    tr.appendChild(present);
+
+    const nameTd = document.createElement("td");
+    nameTd.className = "name";
+
+    const nameInput = document.createElement("input");
+    nameInput.className = "name-input";
+    nameInput.type = "text";
+    nameInput.value = player.name;
+
+    nameInput.addEventListener("change", function() {
+      players[playerIndex].name =
+        this.value.trim() || "Sans nom";
+
+      saveData();
+    });
+
+    nameTd.appendChild(nameInput);
+    tr.appendChild(nameTd);
+
+    for (let i = 1; i <= 4; i++) {
+      tr.appendChild(makeCheckbox(playerIndex, i));
+    }
+
+    const deleteTd = document.createElement("td");
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete";
+    deleteButton.textContent = "✕";
+
+    deleteButton.addEventListener("click", function() {
+      deletePlayer(playerIndex);
+    });
+
+    deleteTd.appendChild(deleteButton);
+    tr.appendChild(deleteTd);
+
+    tbody.appendChild(tr);
+  });
+
+  updateStatus();
+}
+
+function makeCheckbox(playerIndex, checkIndex) {
+
+  const td = document.createElement("td");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked =
+    Boolean(players[playerIndex].checks[checkIndex]);
+
+  checkbox.addEventListener("change", function() {
+
+    players[playerIndex].checks[checkIndex] =
+      this.checked;
+
+    saveData();
+  });
+
+  td.appendChild(checkbox);
+
+  return td;
+}
+
+function addPlayer() {
+
+  const name = prompt("Nom du joueur :");
+
+  if (name === null) {
+    return;
+  }
+
+  const cleanName = name.trim();
+
+  if (!cleanName) {
+    return;
+  }
+
+  players.push(newPlayer(cleanName));
+
+  saveData();
+  render();
+}
+
+function deletePlayer(index) {
+
+  const name = players[index].name;
+
+  if (confirm("Supprimer " + name + " de la liste ?")) {
+
+    players.splice(index, 1);
+
+    saveData();
+    render();
+  }
+}
+
+function resetChecks() {
+
+  if (!players.length) {
+    return;
+  }
+
+  if (!confirm(
+    "Décocher toutes les cases Présent, P1, P2, P3 et P4 ?\n\nLes noms des joueurs seront conservés."
+  )) {
+    return;
+  }
+
+  players.forEach(function(player) {
+    player.checks =
+      [false, false, false, false, false];
+  });
+
+  saveData();
+  render();
+}
+
+function backupData() {
+
+  if (!players.length) {
+    alert("La liste ne contient aucun joueur.");
+    return;
+  }
+
+  const backup = {
+    application: "Controle des joueurs",
+    version: 2,
+    date: new Date().toISOString(),
+    players: players
+  };
+
+  const json =
+    JSON.stringify(backup, null, 2);
+
+  const blob =
+    new Blob([json], {
+      type: "application/json"
+    });
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0,10);
+
+  link.href = url;
+
+  link.download =
+    "sauvegarde-joueurs-" +
+    today +
+    ".json";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  setTimeout(function() {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+function restoreData(event) {
+
+  const file =
+    event.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload = function(e) {
+
+    try {
+
+      const restored =
+        JSON.parse(e.target.result);
+
+      let restoredPlayers;
+
+      if (
+        restored &&
+        Array.isArray(restored.players)
+      ) {
+
+        restoredPlayers =
+          restored.players;
+
+      } else if (
+        Array.isArray(restored)
+      ) {
+
+        restoredPlayers =
+          restored;
+
+      } else {
+
+        throw new Error(
+          "Format non reconnu"
+        );
+      }
+
+      const normalized =
+        restoredPlayers.map(function(player) {
+
+          const checks =
+            Array.isArray(player.checks)
+            ? player.checks.slice(0,5)
+            : [];
+
+          while (checks.length < 5) {
+            checks.push(false);
+          }
+
+          return {
+            name:
+              String(
+                player.name || "Sans nom"
+              ),
+
+            checks:
+              checks.map(Boolean)
+          };
+        });
+
+      if (!confirm(
+        "Restaurer cette sauvegarde ?\n\nLa liste actuelle sera remplacée."
+      )) {
+        event.target.value = "";
+        return;
+      }
+
+      players = normalized;
+
+      saveData();
+      render();
+
+      alert(
+        "La sauvegarde a été restaurée."
+      );
+
+    } catch (error) {
+
+      alert(
+        "Impossible de restaurer ce fichier.\n\nLe fichier n'est pas une sauvegarde valide de l'application."
+      );
+    }
+
+    event.target.value = "";
+  };
+
+  reader.readAsText(file);
+}
+
+function updateStatus() {
+
+  const present =
+    players.filter(function(player) {
+      return Boolean(player.checks[0]);
+    }).length;
+
+  document.getElementById("status")
+    .textContent =
+      players.length +
+      " joueur" +
+      (players.length > 1 ? "s" : "") +
+      " • " +
+      present +
+      " présent" +
+      (present > 1 ? "s" : "");
+}
+
+loadData();
+</script>
+
+</body>
+</html>
