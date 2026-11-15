@@ -53,7 +53,7 @@ const firebaseConfig={
  appId:"1:666413498561:web:516815f8374dc1ceaa5440",
  measurementId:"G-8VVB064YJ9"
 };
-const ADMIN_EMAIL="jeanml565250@gmail.com";
+const ADMIN_EMAILS=["jeanml565250@gmail.com","soulardlaurier@gmail.com"];
 const STORAGE_KEY="controle_joueurs_v3";
 const GROUPS=[
  {id:"hommes-reguliers",name:"Hommes réguliers",css:"group-men-regular"},
@@ -86,7 +86,7 @@ document.body.classList.toggle("hideAdminEntry",!adminEntryEnabled);
 window.loginGoogle=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){alert("Connexion impossible : "+e.message)}};
 window.logoutGoogle=async()=>{await signOut(auth)};
 onAuthStateChanged(auth,user=>{
- isAdmin=Boolean(user&&user.email===ADMIN_EMAIL);
+ isAdmin=Boolean(user&&ADMIN_EMAILS.includes(user.email));
  document.body.classList.toggle("spectator",!isAdmin);
  document.getElementById("modeText").textContent=isAdmin?"Mode administrateur":"Mode spectateur";
  document.getElementById("loginBtn").hidden=Boolean(user);
