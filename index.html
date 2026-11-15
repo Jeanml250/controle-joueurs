@@ -7,998 +7,118 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Joueurs">
-
 <title>Contrôle des joueurs</title>
-
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#f3f5f7;
-  color:#17202a;
-}
-
-header{
-  background:#123b6d;
-  color:white;
-  padding:calc(14px + env(safe-area-inset-top)) 10px 14px;
-  text-align:center;
-}
-
-header h1{margin:0;font-size:23px}
-header p{margin:4px 0 0;font-size:14px;opacity:.9}
-
-main{
-  max-width:900px;
-  margin:auto;
-  padding:10px;
-}
-
-.listbar{
-  background:white;
-  padding:10px;
-  border-radius:12px;
-  margin-bottom:9px;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-
-.listrow{
-  display:flex;
-  gap:7px;
-  align-items:center;
-}
-
-.listrow select{
-  flex:1;
-  min-width:0;
-  font-size:17px;
-  font-weight:700;
-  padding:11px 9px;
-  border:1px solid #bcc5cf;
-  border-radius:9px;
-  background:white;
-}
-
-.listbuttons{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:7px;
-  margin-top:8px;
-}
-
-.buttons{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:7px;
-  margin-bottom:10px;
-}
-
-button{
-  border:0;
-  border-radius:9px;
-  padding:12px 7px;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.newlist{background:#0d6efd;color:white}
-.rename{background:#64748b;color:white}
-.dellist{background:#8b1e27;color:white}
-.add{background:#1677ff;color:white}
-.reset{background:#dc3545;color:white}
-.backup{background:#198754;color:white}
-.restore{background:#6f42c1;color:white}
-
-.group{
-  margin-bottom:12px;
-  background:white;
-  border-radius:11px;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-
-.grouptitle{
-  padding:10px 11px;
-  font-size:16px;
-  font-weight:800;
-  color:white;
-}
-
-.group-men-regular .grouptitle{background:#245b96}
-.group-women-regular .grouptitle{background:#9b4f78}
-.group-men-sub .grouptitle{background:#39755b}
-.group-women-sub .grouptitle{background:#80558c}
-
-.tablewrap{overflow-x:auto}
-
-table{
-  border-collapse:collapse;
-  width:100%;
-  min-width:650px;
-}
-
-th{
-  background:#e8edf3;
-  padding:9px 5px;
-  font-size:13px;
-  border-bottom:2px solid #ccd4dc;
-}
-
-td{
-  padding:8px 5px;
-  text-align:center;
-  border-bottom:1px solid #e1e5e9;
-}
-
-th.name,td.name{text-align:left}
-td.name{min-width:180px}
-
-.nameinput{
-  width:100%;
-  border:1px solid transparent;
-  background:transparent;
-  border-radius:6px;
-  padding:6px;
-  font-size:15px;
-  font-weight:600;
-}
-
-.nameinput:focus{
-  border-color:#1677ff;
-  background:white;
-  outline:none;
-}
-
-.groupselect{
-  width:135px;
-  padding:6px 2px;
-  font-size:12px;
-  border:1px solid #bdc5ce;
-  border-radius:6px;
-  background:white;
-}
-
-input[type=checkbox]{
-  width:29px;
-  height:29px;
-  accent-color:#198754;
-  cursor:pointer;
-}
-
-.trash{
-  background:#f7e8e8;
-  color:#b42318;
-  padding:7px 9px;
-  font-size:18px;
-}
-
-.empty{
-  padding:14px;
-  color:#7a838c;
-  font-style:italic;
-  text-align:center;
-}
-
-.info{
-  background:white;
-  padding:10px 12px;
-  border-radius:10px;
-  font-size:14px;
-  color:#495057;
-  margin-bottom:calc(8px + env(safe-area-inset-bottom));
-}
-
-#fileInput{display:none}
-
-@media(max-width:600px){
-  main{padding:7px}
-  header h1{font-size:21px}
-  button{padding:11px 5px;font-size:13px}
-  input[type=checkbox]{width:31px;height:31px}
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f5f7;color:#17202a}header{background:#123b6d;color:#fff;padding:calc(14px + env(safe-area-inset-top)) 10px 14px;text-align:center}header h1{margin:0;font-size:23px}header p{margin:4px 0 0;font-size:14px;opacity:.9}main{max-width:950px;margin:auto;padding:10px}.session,.listbar{background:#fff;padding:10px;border-radius:12px;margin-bottom:9px;box-shadow:0 2px 8px #0000000f}.session{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.mode{font-weight:800;flex:1}.online{color:#198754}.offline{color:#b42318}.listrow{display:flex;gap:7px}.listrow select{flex:1;min-width:0;font-size:17px;font-weight:700;padding:11px 9px;border:1px solid #bcc5cf;border-radius:9px;background:#fff}.listbuttons{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}.buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px}button{border:0;border-radius:9px;padding:12px 7px;font-size:14px;font-weight:700;cursor:pointer}.login{background:#fff;color:#123b6d;border:2px solid #123b6d}.logout{background:#64748b;color:#fff}.newlist,.add{background:#1677ff;color:#fff}.rename{background:#64748b;color:#fff}.dellist{background:#8b1e27;color:#fff}.reset{background:#dc3545;color:#fff}.backup{background:#198754;color:#fff}.restore{background:#6f42c1;color:#fff}.group{margin-bottom:12px;background:#fff;border-radius:11px;overflow:hidden;box-shadow:0 2px 8px #0000000f}.grouptitle{padding:10px 11px;font-size:16px;font-weight:800;color:#fff}.group-men-regular .grouptitle{background:#245b96}.group-women-regular .grouptitle{background:#9b4f78}.group-men-sub .grouptitle{background:#39755b}.group-women-sub .grouptitle{background:#80558c}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th{background:#e8edf3;padding:9px 5px;font-size:13px;border-bottom:2px solid #ccd4dc}td{padding:8px 5px;text-align:center;border-bottom:1px solid #e1e5e9}th.name,td.name{text-align:left}td.name{min-width:180px}.nameinput{width:100%;border:1px solid transparent;background:transparent;border-radius:6px;padding:6px;font-size:15px;font-weight:600}.nameinput:focus{border-color:#1677ff;background:#fff;outline:none}.groupselect{width:135px;padding:6px 2px;font-size:12px;border:1px solid #bdc5ce;border-radius:6px;background:#fff}input[type=checkbox]{width:29px;height:29px;accent-color:#198754}.trash{background:#f7e8e8;color:#b42318;padding:7px 9px;font-size:18px}.empty{padding:14px;color:#7a838c;font-style:italic;text-align:center}.info{background:#fff;padding:10px 12px;border-radius:10px;font-size:14px;color:#495057;margin-bottom:calc(8px + env(safe-area-inset-bottom))}.spectator input,.spectator select{pointer-events:none}.spectator .adminOnly{display:none!important}#fileInput{display:none}@media(max-width:600px){main{padding:7px}header h1{font-size:21px}button{padding:11px 5px;font-size:13px}input[type=checkbox]{width:31px;height:31px}}
 </style>
 </head>
-
-<body>
-
-<header>
-  <h1>Contrôle des joueurs</h1>
-  <p>Présences et parties</p>
-</header>
-
+<body class="spectator">
+<header><h1>Contrôle des joueurs</h1><p>Résultats en temps réel</p></header>
 <main>
-
+<div class="session">
+  <div><strong id="modeText">Mode spectateur</strong><br><small id="syncText">Connexion à Firebase…</small></div>
+  <div class="mode"></div>
+  <button id="loginBtn" class="login" onclick="loginGoogle()">Connexion administrateur</button>
+  <button id="logoutBtn" class="logout" onclick="logoutGoogle()" hidden>Déconnexion</button>
+</div>
 <div class="listbar">
-  <div class="listrow">
-    <select id="listSelect" onchange="changeList(this.value)"></select>
-  </div>
-
-  <div class="listbuttons">
+  <div class="listrow"><select id="listSelect" onchange="changeList(this.value)"></select></div>
+  <div class="listbuttons adminOnly">
     <button class="newlist" onclick="createList()">+ Nouvelle liste</button>
     <button class="rename" onclick="renameList()">Renommer</button>
     <button class="dellist" onclick="deleteList()">Supprimer liste</button>
   </div>
 </div>
-
-<div class="buttons">
+<div class="buttons adminOnly">
   <button class="add" onclick="addPlayer()">+ Ajouter joueur</button>
   <button class="reset" onclick="resetChecks()">Tout décocher</button>
   <button class="backup" onclick="backupData()">Sauvegarder</button>
   <button class="restore" onclick="document.getElementById('fileInput').click()">Restaurer</button>
 </div>
-
-<input
-  id="fileInput"
-  type="file"
-  accept=".json,application/json"
-  onchange="restoreData(event)"
->
-
-<div id="groups"></div>
-
-<div class="info" id="status"></div>
-
+<input id="fileInput" type="file" accept=".json,application/json" onchange="restoreData(event)">
+<div id="groups"></div><div class="info" id="status"></div>
 </main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getDatabase,ref,onValue,set} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
-<script>
-const STORAGE_KEY="controle_joueurs_v3";
-
-const GROUPS=[
-  {id:"hommes-reguliers",name:"Hommes réguliers",css:"group-men-regular"},
-  {id:"dames-regulieres",name:"Dames régulières",css:"group-women-regular"},
-  {id:"hommes-substituts",name:"Hommes substituts",css:"group-men-sub"},
-  {id:"dames-substituts",name:"Dames substituts",css:"group-women-sub"}
-];
-
-let appData={
-  activeListId:"",
-  lists:[]
+const firebaseConfig={
+ apiKey:"AIzaSyCL7xRoMmNf1Lav4hCUYBPr5UFTbTCDx-E",
+ authDomain:"controle-joueurs.firebaseapp.com",
+ databaseURL:"https://controle-joueurs-default-rtdb.firebaseio.com",
+ projectId:"controle-joueurs",
+ storageBucket:"controle-joueurs.firebasestorage.app",
+ messagingSenderId:"666413498561",
+ appId:"1:666413498561:web:516815f8374dc1ceaa5440",
+ measurementId:"G-8VVB064YJ9"
 };
+const ADMIN_EMAIL="jeanml565250@gmail.com";
+const STORAGE_KEY="controle_joueurs_v3";
+const GROUPS=[
+ {id:"hommes-reguliers",name:"Hommes réguliers",css:"group-men-regular"},
+ {id:"dames-regulieres",name:"Dames régulières",css:"group-women-regular"},
+ {id:"hommes-substituts",name:"Hommes substituts",css:"group-men-sub"},
+ {id:"dames-substituts",name:"Dames substituts",css:"group-women-sub"}
+];
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),dataRef=ref(db,"application");
+let isAdmin=false,cloudReady=false,ignoreNextCloud=false;
+let appData={activeListId:"",lists:[]};
 
-function id(){
-  return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function newPlayer(name,group){return{id:id(),name,group,checks:[false,false,false,false,false]}}
+function newList(name){return{id:id(),name,players:[]}}
+function currentList(){return appData.lists.find(l=>l.id===appData.activeListId)}
+function localLoad(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));if(x&&Array.isArray(x.lists))appData=x}catch(e){}}
+function localSave(){localStorage.setItem(STORAGE_KEY,JSON.stringify(appData))}
+function normalize(){
+ if(!Array.isArray(appData.lists))appData.lists=[];
+ appData.lists.forEach(list=>{if(!list.id)list.id=id();if(!Array.isArray(list.players))list.players=[];list.players.forEach(p=>{if(!p.id)p.id=id();if(!GROUPS.some(g=>g.id===p.group))p.group="hommes-reguliers";if(!Array.isArray(p.checks))p.checks=[];p.checks=p.checks.slice(0,5).map(Boolean);while(p.checks.length<5)p.checks.push(false);let valid=true;for(let i=0;i<5;i++){if(!valid)p.checks[i]=false;if(!p.checks[i])valid=false}})});
+ if(!appData.lists.length){const l=newList("Liste principale");appData.lists=[l];appData.activeListId=l.id}
+ if(!appData.lists.some(l=>l.id===appData.activeListId))appData.activeListId=appData.lists[0].id;
 }
-
-function newPlayer(name,group){
-  return{
-    id:id(),
-    name:name,
-    group:group,
-    checks:[false,false,false,false,false]
-  };
-}
-
-function newList(name){
-  return{
-    id:id(),
-    name:name,
-    players:[]
-  };
-}
-
-function save(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));
-  updateStatus();
-}
-
-function correctInvalidChecks(){
-
-  appData.lists.forEach(list=>{
-
-    list.players.forEach(player=>{
-
-      if(!Array.isArray(player.checks)){
-        player.checks=[false,false,false,false,false];
-      }
-
-      player.checks=player.checks.slice(0,5).map(Boolean);
-
-      while(player.checks.length<5){
-        player.checks.push(false);
-      }
-
-      /*
-        Dès qu'une case non cochée est trouvée,
-        toutes les cases à droite sont décochées.
-      */
-      let chainValid=true;
-
-      for(let i=0;i<=4;i++){
-
-        if(!chainValid){
-          player.checks[i]=false;
-        }
-
-        if(!player.checks[i]){
-          chainValid=false;
-        }
-      }
-    });
-  });
-}
-
-function load(){
-  try{
-    const saved=localStorage.getItem(STORAGE_KEY);
-
-    if(saved){
-      const parsed=JSON.parse(saved);
-
-      if(parsed && Array.isArray(parsed.lists)){
-        appData=parsed;
-      }
-    }
-  }catch(e){}
-
-  if(!appData.lists.length){
-    const list=newList("Liste principale");
-    appData.lists.push(list);
-    appData.activeListId=list.id;
-  }
-
-  if(!appData.lists.some(l=>l.id===appData.activeListId)){
-    appData.activeListId=appData.lists[0].id;
-  }
-
-  correctInvalidChecks();
-  save();
-  render();
-}
-
-function currentList(){
-  return appData.lists.find(l=>l.id===appData.activeListId);
-}
-
-function render(){
-  renderListSelector();
-  renderGroups();
-  updateStatus();
-}
-
-function renderListSelector(){
-  const select=document.getElementById("listSelect");
-  select.innerHTML="";
-
-  appData.lists.forEach(list=>{
-    const option=document.createElement("option");
-
-    option.value=list.id;
-    option.textContent=list.name;
-    option.selected=list.id===appData.activeListId;
-
-    select.appendChild(option);
-  });
-}
-
-function changeList(listId){
-  appData.activeListId=listId;
-  save();
-  render();
-}
-
-function createList(){
-  const name=prompt("Nom de la nouvelle liste :");
-
-  if(name===null || !name.trim()){
-    return;
-  }
-
-  const list=newList(name.trim());
-
-  appData.lists.push(list);
-  appData.activeListId=list.id;
-
-  save();
-  render();
-}
-
-function renameList(){
-  const list=currentList();
-
-  if(!list){
-    return;
-  }
-
-  const name=prompt(
-    "Nouveau nom de la liste :",
-    list.name
-  );
-
-  if(name===null || !name.trim()){
-    return;
-  }
-
-  list.name=name.trim();
-
-  save();
-  render();
-}
-
-function deleteList(){
-
-  if(appData.lists.length===1){
-    alert("Vous devez conserver au moins une liste.");
-    return;
-  }
-
-  const list=currentList();
-
-  if(!confirm(
-    "Supprimer la liste « "+list.name+
-    " » et tous ses joueurs ?"
-  )){
-    return;
-  }
-
-  appData.lists=
-    appData.lists.filter(l=>l.id!==list.id);
-
-  appData.activeListId=
-    appData.lists[0].id;
-
-  save();
-  render();
-}
-
-/*
-  TRI HIÉRARCHIQUE
-
-  Comparaison dans cet ordre :
-
-  Présent
-  P1
-  P2
-  P3
-  P4
-
-  À chaque étape :
-  coché passe avant non coché.
-
-  En cas d'égalité complète :
-  ordre alphabétique.
-*/
-function sortPlayers(players){
-
-  return [...players].sort((a,b)=>{
-
-    for(let column=0;column<=4;column++){
-
-      const aChecked=Boolean(a.checks[column]);
-      const bChecked=Boolean(b.checks[column]);
-
-      if(aChecked && !bChecked){
-        return -1;
-      }
-
-      if(!aChecked && bChecked){
-        return 1;
-      }
-    }
-
-    return a.name.localeCompare(
-      b.name,
-      "fr-CA",
-      {
-        sensitivity:"base",
-        ignorePunctuation:true
-      }
-    );
-  });
-}
-
-function renderGroups(){
-
-  const container=document.getElementById("groups");
-
-  container.innerHTML="";
-
-  const list=currentList();
-
-  if(!list){
-    return;
-  }
-
-  GROUPS.forEach(group=>{
-
-    const section=document.createElement("section");
-    section.className="group "+group.css;
-
-    const title=document.createElement("div");
-    title.className="grouptitle";
-
-    const groupPlayers=
-      list.players.filter(
-        player=>player.group===group.id
-      );
-
-    title.textContent=
-      group.name+" ("+groupPlayers.length+")";
-
-    section.appendChild(title);
-
-    if(groupPlayers.length===0){
-
-      const empty=document.createElement("div");
-      empty.className="empty";
-      empty.textContent="Aucun joueur dans ce groupe";
-
-      section.appendChild(empty);
-
-    }else{
-
-      const players=sortPlayers(groupPlayers);
-
-      const wrap=document.createElement("div");
-      wrap.className="tablewrap";
-
-      const table=document.createElement("table");
-
-      table.innerHTML=`
-        <thead>
-          <tr>
-            <th>Présent</th>
-            <th class="name">Nom</th>
-            <th>P1</th>
-            <th>P2</th>
-            <th>P3</th>
-            <th>P4</th>
-            <th>Groupe</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      `;
-
-      const tbody=table.querySelector("tbody");
-
-      players.forEach(player=>{
-        tbody.appendChild(makePlayerRow(player));
-      });
-
-      wrap.appendChild(table);
-      section.appendChild(wrap);
-    }
-
-    container.appendChild(section);
-  });
-}
-
-function makePlayerRow(player){
-
-  const tr=document.createElement("tr");
-
-  tr.appendChild(makeCheckbox(player,0));
-
-  const nameTd=document.createElement("td");
-  nameTd.className="name";
-
-  const input=document.createElement("input");
-  input.type="text";
-  input.className="nameinput";
-  input.value=player.name;
-
-  input.addEventListener("change",function(){
-
-    player.name=this.value.trim() || "Sans nom";
-
-    save();
-    render();
-  });
-
-  nameTd.appendChild(input);
-  tr.appendChild(nameTd);
-
-  for(let i=1;i<=4;i++){
-    tr.appendChild(makeCheckbox(player,i));
-  }
-
-  const groupTd=document.createElement("td");
-
-  const select=document.createElement("select");
-  select.className="groupselect";
-
-  GROUPS.forEach(group=>{
-
-    const option=document.createElement("option");
-
-    option.value=group.id;
-    option.textContent=group.name;
-    option.selected=player.group===group.id;
-
-    select.appendChild(option);
-  });
-
-  select.addEventListener("change",function(){
-
-    player.group=this.value;
-
-    save();
-    render();
-  });
-
-  groupTd.appendChild(select);
-  tr.appendChild(groupTd);
-
-  const trashTd=document.createElement("td");
-
-  const trash=document.createElement("button");
-  trash.className="trash";
-  trash.textContent="🗑️";
-  trash.title="Supprimer ce joueur";
-
-  trash.addEventListener("click",function(){
-    deletePlayer(player.id);
-  });
-
-  trashTd.appendChild(trash);
-  tr.appendChild(trashTd);
-
-  return tr;
-}
-
-/*
-  GESTION DES CASES
-
-  Présent -> P1 -> P2 -> P3 -> P4
-
-  Une case ne peut être cochée que lorsque
-  toutes les cases à sa gauche sont cochées.
-
-  Lorsqu'une case est décochée,
-  toutes les cases à sa droite sont décochées.
-*/
-function makeCheckbox(player,index){
-
-  const td=document.createElement("td");
-
-  const box=document.createElement("input");
-
-  box.type="checkbox";
-  box.checked=Boolean(player.checks[index]);
-
-  box.addEventListener("change",function(){
-
-    if(this.checked){
-
-      for(let left=0;left<index;left++){
-
-        if(!player.checks[left]){
-
-          this.checked=false;
-
-          const requiredName=
-            left===0
-              ? "Présent"
-              : "P"+left;
-
-          alert(
-            "Vous devez d'abord cocher "+
-            requiredName+"."
-          );
-
-          return;
-        }
-      }
-
-      player.checks[index]=true;
-
-    }else{
-
-      /*
-        La case choisie ET toutes celles
-        situées à droite deviennent non cochées.
-      */
-      for(let right=index;right<=4;right++){
-        player.checks[right]=false;
-      }
-    }
-
-    save();
-
-    /*
-      Réaffichage immédiat pour remettre
-      les joueurs dans le bon ordre.
-    */
-    renderGroups();
-    updateStatus();
-  });
-
-  td.appendChild(box);
-
-  return td;
-}
-
-function addPlayer(){
-
-  const list=currentList();
-
-  if(!list){
-    return;
-  }
-
-  const name=prompt("Nom du joueur :");
-
-  if(name===null || !name.trim()){
-    return;
-  }
-
-  let menu="Choisissez le groupe :\n\n";
-
-  GROUPS.forEach((group,index)=>{
-    menu+=(index+1)+" - "+group.name+"\n";
-  });
-
-  const answer=prompt(menu,"1");
-
-  if(answer===null){
-    return;
-  }
-
-  const number=parseInt(answer,10);
-
-  if(
-    number<1 ||
-    number>4 ||
-    isNaN(number)
-  ){
-    alert("Veuillez choisir 1, 2, 3 ou 4.");
-    return;
-  }
-
-  list.players.push(
-    newPlayer(
-      name.trim(),
-      GROUPS[number-1].id
-    )
-  );
-
-  save();
-  render();
-}
-
-function deletePlayer(playerId){
-
-  const list=currentList();
-
-  const player=
-    list.players.find(
-      p=>p.id===playerId
-    );
-
-  if(!player){
-    return;
-  }
-
-  if(!confirm(
-    "Supprimer « "+player.name+
-    " » de cette liste ?"
-  )){
-    return;
-  }
-
-  list.players=
-    list.players.filter(
-      p=>p.id!==playerId
-    );
-
-  save();
-  render();
-}
-
-function resetChecks(){
-
-  const list=currentList();
-
-  if(!list || !list.players.length){
-    return;
-  }
-
-  if(!confirm(
-    "Décocher toutes les cases de la liste « "+
-    list.name+
-    " » ?\n\n"+
-    "Les joueurs et leurs groupes seront conservés."
-  )){
-    return;
-  }
-
-  list.players.forEach(player=>{
-
-    player.checks=[
-      false,
-      false,
-      false,
-      false,
-      false
-    ];
-  });
-
-  save();
-  render();
-}
-
-function backupData(){
-
-  const backup={
-    application:"Contrôle des joueurs",
-    version:3,
-    date:new Date().toISOString(),
-    data:appData
-  };
-
-  const blob=
-    new Blob(
-      [JSON.stringify(backup,null,2)],
-      {type:"application/json"}
-    );
-
-  const url=URL.createObjectURL(blob);
-
-  const link=document.createElement("a");
-
-  const date=
-    new Date().toISOString().slice(0,10);
-
-  link.href=url;
-
-  link.download=
-    "sauvegarde-joueurs-"+
-    date+
-    ".json";
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  document.body.removeChild(link);
-
-  setTimeout(
-    ()=>URL.revokeObjectURL(url),
-    1000
-  );
-}
-
-function restoreData(event){
-
-  const file=event.target.files[0];
-
-  if(!file){
-    return;
-  }
-
-  const reader=new FileReader();
-
-  reader.onload=function(e){
-
-    try{
-
-      const backup=JSON.parse(e.target.result);
-
-      if(
-        !backup ||
-        !backup.data ||
-        !Array.isArray(backup.data.lists)
-      ){
-        throw new Error("Sauvegarde invalide");
-      }
-
-      if(!confirm(
-        "Restaurer cette sauvegarde ?\n\n"+
-        "Toutes les listes actuelles seront remplacées."
-      )){
-        event.target.value="";
-        return;
-      }
-
-      appData=backup.data;
-
-      appData.lists.forEach(list=>{
-
-        if(!Array.isArray(list.players)){
-          list.players=[];
-        }
-
-        list.players.forEach(player=>{
-
-          if(!player.id){
-            player.id=id();
-          }
-
-          if(
-            !GROUPS.some(
-              group=>group.id===player.group
-            )
-          ){
-            player.group="hommes-reguliers";
-          }
-
-          if(!Array.isArray(player.checks)){
-            player.checks=[
-              false,
-              false,
-              false,
-              false,
-              false
-            ];
-          }
-
-          player.checks=
-            player.checks.slice(0,5).map(Boolean);
-
-          while(player.checks.length<5){
-            player.checks.push(false);
-          }
-        });
-      });
-
-      correctInvalidChecks();
-
-      if(
-        !appData.lists.some(
-          list=>list.id===appData.activeListId
-        )
-      ){
-        appData.activeListId=appData.lists[0].id;
-      }
-
-      save();
-      render();
-
-      alert("Sauvegarde restaurée.");
-
-    }catch(error){
-
-      alert(
-        "Impossible de restaurer ce fichier.\n\n"+
-        "Le fichier ne correspond pas à une sauvegarde valide."
-      );
-    }
-
-    event.target.value="";
-  };
-
-  reader.readAsText(file);
-}
-
-function updateStatus(){
-
-  const list=currentList();
-
-  if(!list){
-
-    document
-      .getElementById("status")
-      .textContent="";
-
-    return;
-  }
-
-  const present=
-    list.players.filter(
-      player=>player.checks[0]
-    ).length;
-
-  document
-    .getElementById("status")
-    .textContent=
-      list.players.length+
-      " joueur"+
-      (list.players.length!==1 ? "s" : "")+
-      " • "+
-      present+
-      " présent"+
-      (present!==1 ? "s" : "")+
-      " • "+
-      appData.lists.length+
-      " liste"+
-      (appData.lists.length!==1 ? "s" : "");
-}
-
-load();
+async function save(){normalize();localSave();render();if(isAdmin&&cloudReady){try{ignoreNextCloud=true;await set(dataRef,appData);setSync("Synchronisé",true)}catch(e){ignoreNextCloud=false;alert("Impossible d’enregistrer dans Firebase : "+e.message)}}}
+function setSync(text,ok){const e=document.getElementById("syncText");e.textContent=text;e.className=ok?"online":"offline"}
+function requireAdmin(){if(isAdmin)return true;alert("Connexion administrateur requise.");return false}
+
+window.loginGoogle=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){alert("Connexion impossible : "+e.message)}};
+window.logoutGoogle=async()=>{await signOut(auth)};
+onAuthStateChanged(auth,user=>{
+ isAdmin=Boolean(user&&user.email===ADMIN_EMAIL);
+ document.body.classList.toggle("spectator",!isAdmin);
+ document.getElementById("modeText").textContent=isAdmin?"Mode administrateur":"Mode spectateur";
+ document.getElementById("loginBtn").hidden=Boolean(user);
+ document.getElementById("logoutBtn").hidden=!user;
+ if(user&&!isAdmin)alert("Ce compte peut consulter les résultats, mais il n’est pas autorisé à les modifier.");
+ render();
+});
+onValue(dataRef,snapshot=>{
+ cloudReady=true;
+ const cloud=snapshot.val();
+ if(cloud&&Array.isArray(cloud.lists)){
+   appData=cloud;normalize();localSave();render();setSync("Résultats à jour",true);
+ }else{
+   normalize();render();setSync(isAdmin?"Base vide : restaurez votre sauvegarde":"Aucun résultat publié",false);
+ }
+},error=>setSync("Erreur de lecture : "+error.message,false));
+
+function sortPlayers(players){return[...players].sort((a,b)=>{for(let i=0;i<5;i++){const x=Boolean(a.checks[i]),y=Boolean(b.checks[i]);if(x&&!y)return-1;if(!x&&y)return 1}return a.name.localeCompare(b.name,"fr-CA",{sensitivity:"base",ignorePunctuation:true})})}
+function render(){renderListSelector();renderGroups();updateStatus()}
+function renderListSelector(){const s=document.getElementById("listSelect");s.innerHTML="";appData.lists.forEach(l=>{const o=document.createElement("option");o.value=l.id;o.textContent=l.name;o.selected=l.id===appData.activeListId;s.appendChild(o)})}
+window.changeList=listId=>{appData.activeListId=listId;localSave();render()};
+window.createList=()=>{if(!requireAdmin())return;const name=prompt("Nom de la nouvelle liste :");if(!name?.trim())return;const l=newList(name.trim());appData.lists.push(l);appData.activeListId=l.id;save()};
+window.renameList=()=>{if(!requireAdmin())return;const l=currentList(),name=prompt("Nouveau nom de la liste :",l.name);if(!name?.trim())return;l.name=name.trim();save()};
+window.deleteList=()=>{if(!requireAdmin())return;if(appData.lists.length===1)return alert("Vous devez conserver au moins une liste.");const l=currentList();if(confirm("Supprimer la liste « "+l.name+" » et tous ses joueurs ?")){appData.lists=appData.lists.filter(x=>x.id!==l.id);appData.activeListId=appData.lists[0].id;save()}};
+function renderGroups(){const c=document.getElementById("groups"),list=currentList();c.innerHTML="";if(!list)return;GROUPS.forEach(g=>{const section=document.createElement("section");section.className="group "+g.css;const gp=list.players.filter(p=>p.group===g.id),title=document.createElement("div");title.className="grouptitle";title.textContent=g.name+" ("+gp.length+")";section.appendChild(title);if(!gp.length){const e=document.createElement("div");e.className="empty";e.textContent="Aucun joueur dans ce groupe";section.appendChild(e)}else{const wrap=document.createElement("div");wrap.className="tablewrap";const table=document.createElement("table");table.innerHTML='<thead><tr><th>Présent</th><th class="name">Nom</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th class="adminOnly">Groupe</th><th class="adminOnly"></th></tr></thead><tbody></tbody>';const body=table.querySelector("tbody");sortPlayers(gp).forEach(p=>body.appendChild(makeRow(p)));wrap.appendChild(table);section.appendChild(wrap)}c.appendChild(section)})}
+function makeRow(p){const tr=document.createElement("tr");tr.appendChild(makeCheckbox(p,0));const nt=document.createElement("td");nt.className="name";const input=document.createElement("input");input.className="nameinput";input.value=p.name;input.readOnly=!isAdmin;input.onchange=()=>{if(!requireAdmin())return;p.name=input.value.trim()||"Sans nom";save()};nt.appendChild(input);tr.appendChild(nt);for(let i=1;i<5;i++)tr.appendChild(makeCheckbox(p,i));const gt=document.createElement("td");gt.className="adminOnly";const sel=document.createElement("select");sel.className="groupselect";GROUPS.forEach(g=>{const o=document.createElement("option");o.value=g.id;o.textContent=g.name;o.selected=p.group===g.id;sel.appendChild(o)});sel.onchange=()=>{p.group=sel.value;save()};gt.appendChild(sel);tr.appendChild(gt);const dt=document.createElement("td");dt.className="adminOnly";const b=document.createElement("button");b.className="trash";b.textContent="🗑️";b.onclick=()=>deletePlayer(p.id);dt.appendChild(b);tr.appendChild(dt);return tr}
+function makeCheckbox(p,index){const td=document.createElement("td"),box=document.createElement("input");box.type="checkbox";box.checked=Boolean(p.checks[index]);box.disabled=!isAdmin;box.onchange=()=>{if(box.checked){for(let left=0;left<index;left++){if(!p.checks[left]){box.checked=false;return alert("Vous devez d’abord cocher "+(left===0?"Présent":"P"+left)+".")}}p.checks[index]=true}else{for(let right=index;right<5;right++)p.checks[right]=false}save()};td.appendChild(box);return td}
+window.addPlayer=()=>{if(!requireAdmin())return;const list=currentList(),name=prompt("Nom du joueur :");if(!name?.trim())return;let menu="Choisissez le groupe :\n\n";GROUPS.forEach((g,i)=>menu+=(i+1)+" - "+g.name+"\n");const n=parseInt(prompt(menu,"1"),10);if(n<1||n>4||isNaN(n))return alert("Veuillez choisir 1, 2, 3 ou 4.");list.players.push(newPlayer(name.trim(),GROUPS[n-1].id));save()};
+function deletePlayer(pid){if(!requireAdmin())return;const list=currentList(),p=list.players.find(x=>x.id===pid);if(p&&confirm("Supprimer « "+p.name+" » ?")){list.players=list.players.filter(x=>x.id!==pid);save()}}
+window.resetChecks=()=>{if(!requireAdmin())return;const list=currentList();if(list.players.length&&confirm("Décocher toutes les cases de « "+list.name+" » ?")){list.players.forEach(p=>p.checks=[false,false,false,false,false]);save()}};
+window.backupData=()=>{const backup={application:"Contrôle des joueurs",version:4,date:new Date().toISOString(),data:appData},blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="sauvegarde-joueurs-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+window.restoreData=event=>{if(!requireAdmin())return;const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const backup=JSON.parse(e.target.result),data=backup.data||backup;if(!data||!Array.isArray(data.lists))throw new Error();if(confirm("Restaurer cette sauvegarde et publier les résultats ?")){appData=data;normalize();save();alert("Sauvegarde restaurée et envoyée à Firebase.")}}catch(err){alert("Fichier de sauvegarde invalide.")}event.target.value=""};reader.readAsText(file)};
+function updateStatus(){const l=currentList();if(!l)return;const present=l.players.filter(p=>p.checks[0]).length;document.getElementById("status").textContent=l.players.length+" joueur"+(l.players.length!==1?"s":"")+" • "+present+" présent"+(present!==1?"s":"")+" • "+appData.lists.length+" liste"+(appData.lists.length!==1?"s":"")}
+localLoad();normalize();localSave();render();
 </script>
-
 </body>
 </html>
