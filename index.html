@@ -2,7 +2,7 @@
 <html lang="fr-CA">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#123b6d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -11,176 +11,193 @@
 <title>Contrôle des joueurs</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f3f5f7;
+  color:#17202a;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f3f5f7;
-  color: #17202a;
+header{
+  background:#123b6d;
+  color:white;
+  padding:calc(14px + env(safe-area-inset-top)) 10px 14px;
+  text-align:center;
 }
 
-header {
-  background: #123b6d;
-  color: white;
-  padding: calc(15px + env(safe-area-inset-top)) 10px 15px;
-  text-align: center;
+header h1{margin:0;font-size:23px}
+header p{margin:4px 0 0;font-size:14px;opacity:.9}
+
+main{
+  max-width:900px;
+  margin:auto;
+  padding:10px;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 23px;
+.listbar{
+  background:white;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:9px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-header p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  opacity: .9;
+.listrow{
+  display:flex;
+  gap:7px;
+  align-items:center;
 }
 
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 10px;
+.listrow select{
+  flex:1;
+  min-width:0;
+  font-size:17px;
+  font-weight:700;
+  padding:11px 9px;
+  border:1px solid #bcc5cf;
+  border-radius:9px;
+  background:white;
 }
 
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
+.listbuttons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+  margin-top:8px;
 }
 
-button {
-  border: 0;
-  border-radius: 10px;
-  padding: 13px 8px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:7px;
+  margin-bottom:10px;
 }
 
-.add {
-  background: #1677ff;
-  color: white;
+button{
+  border:0;
+  border-radius:9px;
+  padding:12px 7px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
 }
 
-.backup {
-  background: #198754;
-  color: white;
+.newlist{background:#0d6efd;color:white}
+.rename{background:#64748b;color:white}
+.dellist{background:#8b1e27;color:white}
+.add{background:#1677ff;color:white}
+.reset{background:#dc3545;color:white}
+.backup{background:#198754;color:white}
+.restore{background:#6f42c1;color:white}
+
+.group{
+  margin-bottom:12px;
+  background:white;
+  border-radius:11px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-.restore {
-  background: #6f42c1;
-  color: white;
+.grouptitle{
+  padding:10px 11px;
+  font-size:16px;
+  font-weight:800;
+  color:white;
 }
 
-.reset {
-  background: #dc3545;
-  color: white;
+.group-men-regular .grouptitle{background:#245b96}
+.group-women-regular .grouptitle{background:#9b4f78}
+.group-men-sub .grouptitle{background:#39755b}
+.group-women-sub .grouptitle{background:#80558c}
+
+.tablewrap{overflow-x:auto}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  min-width:650px;
 }
 
-.table-container {
-  overflow-x: auto;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+th{
+  background:#e8edf3;
+  padding:9px 5px;
+  font-size:13px;
+  border-bottom:2px solid #ccd4dc;
 }
 
-table {
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 590px;
+td{
+  padding:8px 5px;
+  text-align:center;
+  border-bottom:1px solid #e1e5e9;
 }
 
-th {
-  background: #e7edf5;
-  padding: 11px 5px;
-  font-size: 14px;
-  border-bottom: 2px solid #cbd3dd;
-  position: sticky;
-  top: 0;
+th.name,td.name{text-align:left}
+td.name{min-width:180px}
+
+.nameinput{
+  width:100%;
+  border:1px solid transparent;
+  background:transparent;
+  border-radius:6px;
+  padding:6px;
+  font-size:15px;
+  font-weight:600;
 }
 
-td {
-  padding: 9px 5px;
-  text-align: center;
-  border-bottom: 1px solid #e0e4e8;
+.nameinput:focus{
+  border-color:#1677ff;
+  background:white;
+  outline:none;
 }
 
-th.name,
-td.name {
-  text-align: left;
+.groupselect{
+  width:135px;
+  padding:6px 2px;
+  font-size:12px;
+  border:1px solid #bdc5ce;
+  border-radius:6px;
+  background:white;
 }
 
-td.name {
-  min-width: 190px;
+input[type=checkbox]{
+  width:29px;
+  height:29px;
+  accent-color:#198754;
+  cursor:pointer;
 }
 
-.name-input {
-  width: 100%;
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: 7px;
-  padding: 7px;
-  font-size: 16px;
-  font-weight: 600;
+.trash{
+  background:#f7e8e8;
+  color:#b42318;
+  padding:7px 9px;
+  font-size:18px;
 }
 
-.name-input:focus {
-  border-color: #1677ff;
-  background: #fff;
-  outline: none;
+.empty{
+  padding:14px;
+  color:#7a838c;
+  font-style:italic;
+  text-align:center;
 }
 
-input[type="checkbox"] {
-  width: 30px;
-  height: 30px;
-  accent-color: #198754;
-  cursor: pointer;
+.info{
+  background:white;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:14px;
+  color:#495057;
+  margin-bottom:calc(8px + env(safe-area-inset-bottom));
 }
 
-.delete {
-  background: #ededed;
-  color: #b42318;
-  width: 38px;
-  padding: 8px 5px;
-}
+#fileInput{display:none}
 
-.info {
-  background: white;
-  margin-top: 10px;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 14px;
-  color: #495057;
-}
-
-#fileInput {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  main {
-    padding: 7px;
-  }
-
-  header h1 {
-    font-size: 21px;
-  }
-
-  button {
-    font-size: 14px;
-    padding: 12px 5px;
-  }
-
-  input[type="checkbox"] {
-    width: 32px;
-    height: 32px;
-  }
+@media(max-width:600px){
+  main{padding:7px}
+  header h1{font-size:21px}
+  button{padding:11px 5px;font-size:13px}
+  input[type=checkbox]{width:31px;height:31px}
 }
 </style>
 </head>
@@ -194,6 +211,18 @@ input[type="checkbox"] {
 
 <main>
 
+<div class="listbar">
+  <div class="listrow">
+    <select id="listSelect" onchange="changeList(this.value)"></select>
+  </div>
+
+  <div class="listbuttons">
+    <button class="newlist" onclick="createList()">+ Nouvelle liste</button>
+    <button class="rename" onclick="renameList()">Renommer</button>
+    <button class="dellist" onclick="deleteList()">Supprimer liste</button>
+  </div>
+</div>
+
 <div class="buttons">
   <button class="add" onclick="addPlayer()">+ Ajouter joueur</button>
   <button class="reset" onclick="resetChecks()">Tout décocher</button>
@@ -201,366 +230,482 @@ input[type="checkbox"] {
   <button class="restore" onclick="document.getElementById('fileInput').click()">Restaurer</button>
 </div>
 
-<input
-  id="fileInput"
-  type="file"
-  accept=".json,application/json"
-  onchange="restoreData(event)"
->
+<input id="fileInput"
+       type="file"
+       accept=".json,application/json"
+       onchange="restoreData(event)">
 
-<div class="table-container">
-<table>
-
-<thead>
-<tr>
-  <th>Présent</th>
-  <th class="name">Nom</th>
-  <th>P1</th>
-  <th>P2</th>
-  <th>P3</th>
-  <th>P4</th>
-  <th></th>
-</tr>
-</thead>
-
-<tbody id="players"></tbody>
-
-</table>
-</div>
+<div id="groups"></div>
 
 <div class="info" id="status"></div>
 
 </main>
 
 <script>
-const STORAGE_KEY = "controle_joueurs_v2";
+const STORAGE_KEY="controle_joueurs_v3";
 
-let players = [];
+const GROUPS=[
+  {id:"hommes-reguliers",name:"Hommes réguliers",css:"group-men-regular"},
+  {id:"dames-regulieres",name:"Dames régulières",css:"group-women-regular"},
+  {id:"hommes-substituts",name:"Hommes substituts",css:"group-men-sub"},
+  {id:"dames-substituts",name:"Dames substituts",css:"group-women-sub"}
+];
 
-function newPlayer(name) {
-  return {
-    name: name,
-    checks: [false, false, false, false, false]
+let appData={
+  activeListId:"",
+  lists:[]
+};
+
+function id(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+
+function newPlayer(name,group){
+  return{
+    id:id(),
+    name:name,
+    group:group,
+    checks:[false,false,false,false,false]
   };
 }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+function newList(name){
+  return{
+    id:id(),
+    name:name,
+    players:[]
+  };
+}
 
-    if (saved) {
-      const data = JSON.parse(saved);
+function save(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));
+  updateStatus();
+}
 
-      if (Array.isArray(data)) {
-        players = data;
+function load(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed=JSON.parse(saved);
+      if(parsed && Array.isArray(parsed.lists)){
+        appData=parsed;
       }
     }
-  } catch (error) {
-    console.error(error);
+  }catch(e){}
+
+  if(!appData.lists.length){
+    const list=newList("Liste principale");
+    appData.lists.push(list);
+    appData.activeListId=list.id;
+    save();
+  }
+
+  if(!appData.lists.some(l=>l.id===appData.activeListId)){
+    appData.activeListId=appData.lists[0].id;
   }
 
   render();
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+function currentList(){
+  return appData.lists.find(l=>l.id===appData.activeListId);
+}
+
+function render(){
+  renderListSelector();
+  renderGroups();
   updateStatus();
 }
 
-function render() {
-  const tbody = document.getElementById("players");
+function renderListSelector(){
+  const select=document.getElementById("listSelect");
+  select.innerHTML="";
 
-  tbody.innerHTML = "";
+  appData.lists.forEach(list=>{
+    const option=document.createElement("option");
+    option.value=list.id;
+    option.textContent=list.name;
+    option.selected=list.id===appData.activeListId;
+    select.appendChild(option);
+  });
+}
 
-  players.forEach(function(player, playerIndex) {
+function changeList(listId){
+  appData.activeListId=listId;
+  save();
+  render();
+}
 
-    const tr = document.createElement("tr");
+function createList(){
+  const name=prompt("Nom de la nouvelle liste :");
+  if(name===null || !name.trim())return;
 
-    const present = makeCheckbox(playerIndex, 0);
-    tr.appendChild(present);
+  const list=newList(name.trim());
+  appData.lists.push(list);
+  appData.activeListId=list.id;
 
-    const nameTd = document.createElement("td");
-    nameTd.className = "name";
+  save();
+  render();
+}
 
-    const nameInput = document.createElement("input");
-    nameInput.className = "name-input";
-    nameInput.type = "text";
-    nameInput.value = player.name;
+function renameList(){
+  const list=currentList();
+  if(!list)return;
 
-    nameInput.addEventListener("change", function() {
-      players[playerIndex].name =
-        this.value.trim() || "Sans nom";
+  const name=prompt("Nouveau nom de la liste :",list.name);
+  if(name===null || !name.trim())return;
 
-      saveData();
-    });
+  list.name=name.trim();
+  save();
+  render();
+}
 
-    nameTd.appendChild(nameInput);
-    tr.appendChild(nameTd);
+function deleteList(){
+  if(appData.lists.length===1){
+    alert("Vous devez conserver au moins une liste.");
+    return;
+  }
 
-    for (let i = 1; i <= 4; i++) {
-      tr.appendChild(makeCheckbox(playerIndex, i));
+  const list=currentList();
+
+  if(!confirm(
+    "Supprimer la liste « "+list.name+" » et tous ses joueurs ?"
+  ))return;
+
+  appData.lists=appData.lists.filter(l=>l.id!==list.id);
+  appData.activeListId=appData.lists[0].id;
+
+  save();
+  render();
+}
+
+function renderGroups(){
+  const container=document.getElementById("groups");
+  container.innerHTML="";
+
+  const list=currentList();
+  if(!list)return;
+
+  GROUPS.forEach(group=>{
+    const section=document.createElement("section");
+    section.className="group "+group.css;
+
+    const title=document.createElement("div");
+    title.className="grouptitle";
+
+    const count=list.players.filter(p=>p.group===group.id).length;
+    title.textContent=group.name+" ("+count+")";
+
+    section.appendChild(title);
+
+    const players=list.players.filter(p=>p.group===group.id);
+
+    if(players.length===0){
+      const empty=document.createElement("div");
+      empty.className="empty";
+      empty.textContent="Aucun joueur dans ce groupe";
+      section.appendChild(empty);
+    }else{
+      const wrap=document.createElement("div");
+      wrap.className="tablewrap";
+
+      const table=document.createElement("table");
+
+      table.innerHTML=`
+        <thead>
+          <tr>
+            <th>Présent</th>
+            <th class="name">Nom</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>P4</th>
+            <th>Groupe</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody=table.querySelector("tbody");
+
+      players.forEach(player=>{
+        tbody.appendChild(makePlayerRow(player));
+      });
+
+      wrap.appendChild(table);
+      section.appendChild(wrap);
     }
 
-    const deleteTd = document.createElement("td");
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "delete";
-    deleteButton.textContent = "✕";
-
-    deleteButton.addEventListener("click", function() {
-      deletePlayer(playerIndex);
-    });
-
-    deleteTd.appendChild(deleteButton);
-    tr.appendChild(deleteTd);
-
-    tbody.appendChild(tr);
+    container.appendChild(section);
   });
-
-  updateStatus();
 }
 
-function makeCheckbox(playerIndex, checkIndex) {
+function makePlayerRow(player){
+  const tr=document.createElement("tr");
 
-  const td = document.createElement("td");
+  tr.appendChild(makeCheckbox(player,0));
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked =
-    Boolean(players[playerIndex].checks[checkIndex]);
+  const nameTd=document.createElement("td");
+  nameTd.className="name";
 
-  checkbox.addEventListener("change", function() {
+  const input=document.createElement("input");
+  input.type="text";
+  input.className="nameinput";
+  input.value=player.name;
 
-    players[playerIndex].checks[checkIndex] =
-      this.checked;
-
-    saveData();
+  input.addEventListener("change",function(){
+    player.name=this.value.trim() || "Sans nom";
+    save();
+    render();
   });
 
-  td.appendChild(checkbox);
+  nameTd.appendChild(input);
+  tr.appendChild(nameTd);
 
+  for(let i=1;i<=4;i++){
+    tr.appendChild(makeCheckbox(player,i));
+  }
+
+  const groupTd=document.createElement("td");
+  const select=document.createElement("select");
+  select.className="groupselect";
+
+  GROUPS.forEach(group=>{
+    const option=document.createElement("option");
+    option.value=group.id;
+    option.textContent=group.name;
+    option.selected=player.group===group.id;
+    select.appendChild(option);
+  });
+
+  select.addEventListener("change",function(){
+    player.group=this.value;
+    save();
+    render();
+  });
+
+  groupTd.appendChild(select);
+  tr.appendChild(groupTd);
+
+  const trashTd=document.createElement("td");
+
+  const trash=document.createElement("button");
+  trash.className="trash";
+  trash.textContent="🗑️";
+  trash.title="Supprimer ce joueur";
+
+  trash.addEventListener("click",function(){
+    deletePlayer(player.id);
+  });
+
+  trashTd.appendChild(trash);
+  tr.appendChild(trashTd);
+
+  return tr;
+}
+
+function makeCheckbox(player,index){
+  const td=document.createElement("td");
+
+  const box=document.createElement("input");
+  box.type="checkbox";
+  box.checked=Boolean(player.checks[index]);
+
+  box.addEventListener("change",function(){
+    player.checks[index]=this.checked;
+    save();
+  });
+
+  td.appendChild(box);
   return td;
 }
 
-function addPlayer() {
+function addPlayer(){
+  const list=currentList();
+  if(!list)return;
 
-  const name = prompt("Nom du joueur :");
+  const name=prompt("Nom du joueur :");
+  if(name===null || !name.trim())return;
 
-  if (name === null) {
-    return;
-  }
-
-  const cleanName = name.trim();
-
-  if (!cleanName) {
-    return;
-  }
-
-  players.push(newPlayer(cleanName));
-
-  saveData();
-  render();
-}
-
-function deletePlayer(index) {
-
-  const name = players[index].name;
-
-  if (confirm("Supprimer " + name + " de la liste ?")) {
-
-    players.splice(index, 1);
-
-    saveData();
-    render();
-  }
-}
-
-function resetChecks() {
-
-  if (!players.length) {
-    return;
-  }
-
-  if (!confirm(
-    "Décocher toutes les cases Présent, P1, P2, P3 et P4 ?\n\nLes noms des joueurs seront conservés."
-  )) {
-    return;
-  }
-
-  players.forEach(function(player) {
-    player.checks =
-      [false, false, false, false, false];
+  let menu="Choisissez le groupe :\n\n";
+  GROUPS.forEach((g,i)=>{
+    menu+=(i+1)+" - "+g.name+"\n";
   });
 
-  saveData();
+  const answer=prompt(menu,"1");
+  if(answer===null)return;
+
+  const number=parseInt(answer,10);
+
+  if(number<1 || number>4 || isNaN(number)){
+    alert("Veuillez choisir 1, 2, 3 ou 4.");
+    return;
+  }
+
+  list.players.push(
+    newPlayer(name.trim(),GROUPS[number-1].id)
+  );
+
+  save();
   render();
 }
 
-function backupData() {
+function deletePlayer(playerId){
+  const list=currentList();
+  const player=list.players.find(p=>p.id===playerId);
+  if(!player)return;
 
-  if (!players.length) {
-    alert("La liste ne contient aucun joueur.");
-    return;
-  }
+  if(!confirm("Supprimer « "+player.name+" » de cette liste ?"))return;
 
-  const backup = {
-    application: "Controle des joueurs",
-    version: 2,
-    date: new Date().toISOString(),
-    players: players
-  };
+  list.players=list.players.filter(p=>p.id!==playerId);
 
-  const json =
-    JSON.stringify(backup, null, 2);
-
-  const blob =
-    new Blob([json], {
-      type: "application/json"
-    });
-
-  const url =
-    URL.createObjectURL(blob);
-
-  const link =
-    document.createElement("a");
-
-  const today =
-    new Date()
-      .toISOString()
-      .slice(0,10);
-
-  link.href = url;
-
-  link.download =
-    "sauvegarde-joueurs-" +
-    today +
-    ".json";
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  document.body.removeChild(link);
-
-  setTimeout(function() {
-    URL.revokeObjectURL(url);
-  }, 1000);
+  save();
+  render();
 }
 
-function restoreData(event) {
+function resetChecks(){
+  const list=currentList();
+  if(!list || !list.players.length)return;
 
-  const file =
-    event.target.files[0];
+  if(!confirm(
+    "Décocher toutes les cases de la liste « "+
+    list.name+
+    " » ?\n\nLes joueurs et leurs groupes seront conservés."
+  ))return;
 
-  if (!file) {
-    return;
-  }
+  list.players.forEach(player=>{
+    player.checks=[false,false,false,false,false];
+  });
 
-  const reader =
-    new FileReader();
+  save();
+  render();
+}
 
-  reader.onload = function(e) {
+function backupData(){
+  const backup={
+    application:"Contrôle des joueurs",
+    version:3,
+    date:new Date().toISOString(),
+    data:appData
+  };
 
-    try {
+  const blob=new Blob(
+    [JSON.stringify(backup,null,2)],
+    {type:"application/json"}
+  );
 
-      const restored =
-        JSON.parse(e.target.result);
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  const date=new Date().toISOString().slice(0,10);
 
-      let restoredPlayers;
+  link.href=url;
+  link.download="sauvegarde-joueurs-"+date+".json";
 
-      if (
-        restored &&
-        Array.isArray(restored.players)
-      ) {
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
-        restoredPlayers =
-          restored.players;
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 
-      } else if (
-        Array.isArray(restored)
-      ) {
+function restoreData(event){
+  const file=event.target.files[0];
+  if(!file)return;
 
-        restoredPlayers =
-          restored;
+  const reader=new FileReader();
 
-      } else {
+  reader.onload=function(e){
+    try{
+      const backup=JSON.parse(e.target.result);
 
-        throw new Error(
-          "Format non reconnu"
-        );
+      if(
+        !backup ||
+        !backup.data ||
+        !Array.isArray(backup.data.lists)
+      ){
+        throw new Error("Sauvegarde invalide");
       }
 
-      const normalized =
-        restoredPlayers.map(function(player) {
-
-          const checks =
-            Array.isArray(player.checks)
-            ? player.checks.slice(0,5)
-            : [];
-
-          while (checks.length < 5) {
-            checks.push(false);
-          }
-
-          return {
-            name:
-              String(
-                player.name || "Sans nom"
-              ),
-
-            checks:
-              checks.map(Boolean)
-          };
-        });
-
-      if (!confirm(
-        "Restaurer cette sauvegarde ?\n\nLa liste actuelle sera remplacée."
-      )) {
-        event.target.value = "";
+      if(!confirm(
+        "Restaurer cette sauvegarde ?\n\nToutes les listes actuelles seront remplacées."
+      )){
+        event.target.value="";
         return;
       }
 
-      players = normalized;
+      appData=backup.data;
 
-      saveData();
+      appData.lists.forEach(list=>{
+        if(!Array.isArray(list.players))list.players=[];
+
+        list.players.forEach(player=>{
+          if(!player.id)player.id=id();
+
+          if(!GROUPS.some(g=>g.id===player.group)){
+            player.group="hommes-reguliers";
+          }
+
+          if(!Array.isArray(player.checks)){
+            player.checks=[false,false,false,false,false];
+          }
+
+          player.checks=player.checks.slice(0,5).map(Boolean);
+
+          while(player.checks.length<5){
+            player.checks.push(false);
+          }
+        });
+      });
+
+      if(
+        !appData.lists.some(l=>l.id===appData.activeListId)
+      ){
+        appData.activeListId=appData.lists[0].id;
+      }
+
+      save();
       render();
 
-      alert(
-        "La sauvegarde a été restaurée."
-      );
+      alert("Sauvegarde restaurée.");
 
-    } catch (error) {
-
+    }catch(error){
       alert(
-        "Impossible de restaurer ce fichier.\n\nLe fichier n'est pas une sauvegarde valide de l'application."
+        "Impossible de restaurer ce fichier.\n\nLe fichier ne correspond pas à une sauvegarde valide."
       );
     }
 
-    event.target.value = "";
+    event.target.value="";
   };
 
   reader.readAsText(file);
 }
 
-function updateStatus() {
+function updateStatus(){
+  const list=currentList();
 
-  const present =
-    players.filter(function(player) {
-      return Boolean(player.checks[0]);
-    }).length;
+  if(!list){
+    document.getElementById("status").textContent="";
+    return;
+  }
 
-  document.getElementById("status")
-    .textContent =
-      players.length +
-      " joueur" +
-      (players.length > 1 ? "s" : "") +
-      " • " +
-      present +
-      " présent" +
-      (present > 1 ? "s" : "");
+  const present=list.players.filter(p=>p.checks[0]).length;
+
+  document.getElementById("status").textContent=
+    list.players.length+
+    " joueur"+
+    (list.players.length!==1 ? "s" : "")+
+    " • "+
+    present+
+    " présent"+
+    (present!==1 ? "s" : "")+
+    " • "+
+    appData.lists.length+
+    " liste"+
+    (appData.lists.length!==1 ? "s" : "");
 }
 
-loadData();
+load();
 </script>
 
 </body>
