@@ -83,25 +83,18 @@ function setSync(text,ok){const e=document.getElementById("syncText");e.textCont
 function requireAdmin(){if(isAdmin)return true;alert("Connexion administrateur requise.");return false}
 
 document.body.classList.toggle("hideAdminEntry",!adminEntryEnabled);
-window.loginGoogle=async()=>{
-  try{
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt:"select_account"
-    });
-    await signInWithPopup(auth,provider);
-  }catch(e){
-    alert("Connexion impossible : "+e.message);
-  }
-};
+window.loginGoogle=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){alert("Connexion impossible : "+e.message)}};
 window.logoutGoogle=async()=>{await signOut(auth)};
 onAuthStateChanged(auth,user=>{
- isAdmin=Boolean(user&&ADMIN_EMAILS.includes(user.email));
+ // Un compte autorisé ne devient administrateur que lorsque l’URL contient ?admin=1.
+ // L’URL normale demeure toujours en mode spectateur, même si Firebase a conservé une session admin.
+ const authorizedAdmin=Boolean(user&&ADMIN_EMAILS.includes(user.email));
+ isAdmin=adminEntryEnabled&&authorizedAdmin;
  document.body.classList.toggle("spectator",!isAdmin);
  document.getElementById("modeText").textContent=isAdmin?"Mode administrateur":"Mode spectateur";
- document.getElementById("loginBtn").hidden=Boolean(user);
- document.getElementById("logoutBtn").hidden=!user;
- if(user&&!isAdmin)alert("Ce compte peut consulter les résultats, mais il n’est pas autorisé à les modifier.");
+ document.getElementById("loginBtn").hidden=Boolean(user)||!adminEntryEnabled;
+ document.getElementById("logoutBtn").hidden=!user||!adminEntryEnabled;
+ if(adminEntryEnabled&&user&&!authorizedAdmin)alert("Ce compte peut consulter les résultats, mais il n’est pas autorisé à les modifier.");
  render();
 });
 onValue(dataRef,snapshot=>{
