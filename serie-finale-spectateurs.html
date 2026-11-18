@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
   <title>Série finale - Résultats</title>
 
   <style>
@@ -24,15 +26,35 @@
 
 <body>
 
-  <img id="resultats" src="resultats.png" alt="Résultats de la série finale">
+  <img id="resultats"
+       src="resultats.png"
+       alt="Résultats de la série finale">
 
   <script>
+    const imageAffichee = document.getElementById("resultats");
+    let chargementEnCours = false;
+
     function actualiserResultats() {
-      const image = document.getElementById("resultats");
-      image.src = "resultats.png?t=" + Date.now();
+      if (chargementEnCours) return;
+
+      chargementEnCours = true;
+
+      const nouvelleImage = new Image();
+
+      nouvelleImage.onload = function () {
+        imageAffichee.src = nouvelleImage.src;
+        chargementEnCours = false;
+      };
+
+      nouvelleImage.onerror = function () {
+        chargementEnCours = false;
+      };
+
+      nouvelleImage.src =
+        "resultats.png?t=" + Date.now();
     }
 
-    setInterval(actualiserResultats, 5000);
+    setInterval(actualiserResultats, 2000);
   </script>
 
 </body>
