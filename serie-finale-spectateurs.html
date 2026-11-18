@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Série finale - Résultats</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: white;
+      width: 100%;
+      min-height: 100%;
+    }
+
+    #resultats {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <img id="resultats" src="resultats.png" alt="Résultats de la série finale">
+
+  <script>
+    function actualiserResultats() {
+      const image = document.getElementById("resultats");
+      image.src = "resultats.png?t=" + Date.now();
+    }
+
+    setInterval(actualiserResultats, 5000);
+  </script>
+
+</body>
+</html>
